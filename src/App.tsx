@@ -7,6 +7,7 @@ import LogModal from './components/LogModal';
 import SensorHub from './components/SensorHub';
 import Soundscapes from './components/Soundscapes';
 import AuthModal from './components/AuthModal';
+import StorageHousekeepingModal from './components/StorageHousekeepingModal';
 
 import { MetricLog, DailyGoals, ChatMessage, UserProfile } from './types';
 import { SEED_LOGS, DEFAULT_GOALS, getRelativeDateString, getStatsForDay } from './utils';
@@ -18,7 +19,8 @@ import {
   Plus,
   Camera,
   Music,
-  UserCheck
+  UserCheck,
+  HardDrive
 } from 'lucide-react';
 
 const DEFAULT_USER: UserProfile = {
@@ -43,6 +45,7 @@ export default function App() {
     return DEFAULT_USER;
   });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isHousekeepingOpen, setIsHousekeepingOpen] = useState<boolean>(false);
 
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'coach-leo' | 'sensors' | 'soundscapes'>('dashboard');
@@ -257,6 +260,15 @@ export default function App() {
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
             Watch Sync Active
           </div>
+          <button
+            onClick={() => setIsHousekeepingOpen(true)}
+            className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 px-3 rounded-2xl text-[10px] font-extrabold uppercase transition-all active:scale-95 cursor-pointer shadow-2xs"
+            title="Inspect & Clean Local Phone Storage"
+          >
+            <HardDrive className="w-3.5 h-3.5 text-indigo-600" />
+            <span className="hidden sm:inline">Storage Clean</span>
+          </button>
+          
           <div className="hidden md:block h-6 w-[1px] bg-slate-200"></div>
           
           {/* Interactive Google Sign-In & User Account Profile Trigger */}
@@ -578,6 +590,23 @@ export default function App() {
         onClose={() => setIsAuthModalOpen(false)}
         currentUser={currentUser}
         onSwitchUser={handleSwitchUser}
+      />
+
+      {/* Storage & Housekeeping Manager Modal */}
+      <StorageHousekeepingModal 
+        isOpen={isHousekeepingOpen}
+        onClose={() => setIsHousekeepingOpen(false)}
+        userId={currentUser.id}
+        logs={logs}
+        chatHistory={chatHistory}
+        onUpdateLogs={(newLogs) => {
+          setLogs(newLogs);
+          saveLogsToStorage(newLogs);
+        }}
+        onUpdateChat={(newChat) => {
+          setChatHistory(newChat);
+          saveChatToStorage(newChat);
+        }}
       />
 
     </div>
