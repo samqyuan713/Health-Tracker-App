@@ -12,6 +12,7 @@ import ProUpgradeModal from './components/ProUpgradeModal';
 
 import { MetricLog, DailyGoals, ChatMessage, UserProfile } from './types';
 import { SEED_LOGS, DEFAULT_GOALS, getRelativeDateString, getStatsForDay } from './utils';
+import { TRANSLATIONS, SupportedLanguage } from './utils/i18n';
 
 import { 
   Heart, 
@@ -23,7 +24,8 @@ import {
   UserCheck,
   HardDrive,
   Crown,
-  Zap
+  Zap,
+  Globe
 } from 'lucide-react';
 
 const DEFAULT_USER: UserProfile = {
@@ -59,6 +61,18 @@ export default function App() {
     return saved ? parseInt(saved, 10) : 30;
   });
   const [isProModalOpen, setIsProModalOpen] = useState<boolean>(false);
+
+  // i18n Language State
+  const [currentLang, setCurrentLang] = useState<SupportedLanguage>(() => {
+    return (localStorage.getItem('vitalstream_language') as SupportedLanguage) || 'en';
+  });
+
+  const handleLanguageChange = (lang: SupportedLanguage) => {
+    setCurrentLang(lang);
+    localStorage.setItem('vitalstream_language', lang);
+  };
+
+  const t = TRANSLATIONS[currentLang];
 
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'coach-leo' | 'sensors' | 'soundscapes'>('dashboard');
@@ -273,6 +287,24 @@ export default function App() {
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
             Watch Sync Active
           </div>
+          {/* Language / Asian Languages Selector Dropdown */}
+          <div className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 p-1 px-2 rounded-2xl border border-slate-200/80 text-[10px] font-bold">
+            <Globe className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+            <select
+              value={currentLang}
+              onChange={(e) => handleLanguageChange(e.target.value as SupportedLanguage)}
+              className="bg-transparent font-extrabold text-slate-800 text-[10px] focus:outline-none cursor-pointer py-1"
+              title={t.selectLanguage}
+            >
+              <option value="en">English (US)</option>
+              <option value="zh-CN">简体中文 (CN)</option>
+              <option value="zh-TW">繁體中文 (TW)</option>
+              <option value="ja">日本語 (JP)</option>
+              <option value="ko">한국어 (KR)</option>
+              <option value="km">ភាសាខ្មែរ (KH)</option>
+            </select>
+          </div>
+
           <button
             onClick={() => setIsHousekeepingOpen(true)}
             className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 px-3 rounded-2xl text-[10px] font-extrabold uppercase transition-all active:scale-95 cursor-pointer shadow-2xs"

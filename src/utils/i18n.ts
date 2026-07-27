@@ -1,0 +1,257 @@
+export type SupportedLanguage = 'en' | 'zh-CN' | 'zh-TW' | 'ja' | 'ko' | 'km';
+
+export interface TranslationDictionary {
+  appName: string;
+  appSubtitle: string;
+  dashboard: string;
+  analytics: string;
+  coachLeo: string;
+  biometricSensors: string;
+  soundscapes: string;
+  storageClean: string;
+  proUpgrade: string;
+  proUnlimited: string;
+  credits: string;
+  logMetric: string;
+  todayOverview: string;
+  calories: string;
+  water: string;
+  burn: string;
+  sleep: string;
+  weight: string;
+  mood: string;
+  heartRate: string;
+  hrv: string;
+  opticalPPGInstructions: string;
+  aiMealInstructions: string;
+  fingerWarning: string;
+  startLiveStream: string;
+  stopStream: string;
+  snapPhoto: string;
+  opticalScan: string;
+  analyzingSnapshot: string;
+  takeMealPhoto: string;
+  scanMealDesc: string;
+  storageHousekeeping: string;
+  monetizationPlans: string;
+  selectLanguage: string;
+}
+
+export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
+  'en': {
+    appName: 'Vitalstream',
+    appSubtitle: 'AI Health & Biometric Tracker',
+    dashboard: 'Dashboard',
+    analytics: 'Analytics',
+    coachLeo: 'Coach Leo AI',
+    biometricSensors: 'Biometric Sensors',
+    soundscapes: 'Soundscapes',
+    storageClean: 'Storage Clean',
+    proUpgrade: 'Upgrade Pro',
+    proUnlimited: 'Pro Unlimited',
+    credits: 'Credits',
+    logMetric: 'Log Metric',
+    todayOverview: "Today's Biometric Summary",
+    calories: 'Calorie Intake',
+    water: 'Hydration',
+    burn: 'Active Calories',
+    sleep: 'Sleep Quality',
+    weight: 'Body Weight',
+    mood: 'Emotional Mood',
+    heartRate: 'Heart Rate',
+    hrv: 'HRV Index',
+    opticalPPGInstructions: 'Cover the rear camera lens with your index fingertip. The camera reads red blood flow pulses.',
+    aiMealInstructions: 'Point camera at your food plate or upload a photo to auto-detect ingredients & macros with Gemini AI.',
+    fingerWarning: 'Finger not detected over rear camera lens! Please firmly cover the rear camera lens with your fingertip.',
+    startLiveStream: 'Start Live Camera',
+    stopStream: 'Kill Stream',
+    snapPhoto: 'Snap Photo',
+    opticalScan: 'Optical Scan',
+    analyzingSnapshot: 'AI Vision Analyzing Ingredients...',
+    takeMealPhoto: 'Take / Upload Meal Photo',
+    scanMealDesc: 'Scans meal & auto-detects ingredients with Gemini AI',
+    storageHousekeeping: 'Storage & Housekeeping',
+    monetizationPlans: 'Monetization & Plans',
+    selectLanguage: 'Language / 语言 / 言語'
+  },
+  'zh-CN': {
+    appName: 'Vitalstream 脉动',
+    appSubtitle: 'AI 智能健康与生物体征追踪',
+    dashboard: '仪表盘',
+    analytics: '数据分析',
+    coachLeo: 'Leo AI 健管教练',
+    biometricSensors: '生物识别传感器',
+    soundscapes: '疗愈音效',
+    storageClean: '空间清理',
+    proUpgrade: '升级专业版',
+    proUnlimited: 'Pro 无限版',
+    credits: 'AI 额度',
+    logMetric: '打卡记录',
+    todayOverview: '今日体征总览',
+    calories: '膳食热量',
+    water: '饮水量',
+    burn: '运动消耗',
+    sleep: '睡眠质量',
+    weight: '体重记录',
+    mood: '情绪状态',
+    heartRate: '实时心率',
+    hrv: '心率变异性 HRV',
+    opticalPPGInstructions: '请用食指肚完全覆盖手机后置摄像头，摄像头将通过血管红光吸收测算心率。',
+    aiMealInstructions: '将摄像头对准餐盘或上传美食照片，Gemini AI 将自动识别食材与三大营养素。',
+    fingerWarning: '未检测到手指覆盖后置镜头！请用手指贴紧背部摄像头镜头。',
+    startLiveStream: '开启摄像头',
+    stopStream: '关闭视频流',
+    snapPhoto: '拍摄快照',
+    opticalScan: '光学智能扫描',
+    analyzingSnapshot: 'AI 视觉识别成分中...',
+    takeMealPhoto: '拍摄/上传餐食照片',
+    scanMealDesc: '智能扫描餐盘并由 Gemini AI 自动识别成分卡路里',
+    storageHousekeeping: '存储与垃圾清理',
+    monetizationPlans: '订阅会员与服务',
+    selectLanguage: '语言选择 (Language)'
+  },
+  'zh-TW': {
+    appName: 'Vitalstream 脈動',
+    appSubtitle: 'AI 智能健康與生物體徵追蹤',
+    dashboard: '儀表板',
+    analytics: '數據分析',
+    coachLeo: 'Leo AI 健管教練',
+    biometricSensors: '生物識別感測器',
+    soundscapes: '療癒音效',
+    storageClean: '空間清理',
+    proUpgrade: '升級專業版',
+    proUnlimited: 'Pro 無限版',
+    credits: 'AI 點數',
+    logMetric: '打卡記錄',
+    todayOverview: '今日體徵總覽',
+    calories: '膳食熱量',
+    water: '飲水量',
+    burn: '運動消耗',
+    sleep: '睡眠品質',
+    weight: '體重記錄',
+    mood: '情緒狀態',
+    heartRate: '即時心率',
+    hrv: '心率變異性 HRV',
+    opticalPPGInstructions: '請用食指指腹完全覆蓋手機後置鏡頭，鏡頭將透過血管紅光吸收測算心率。',
+    aiMealInstructions: '將鏡頭對準餐盤或上傳美食照片，Gemini AI 將自動識別食材與三大營養素。',
+    fingerWarning: '未檢測到手指覆蓋後置鏡頭！請用手指貼緊背部鏡頭。',
+    startLiveStream: '開啟鏡頭',
+    stopStream: '關閉視訊流',
+    snapPhoto: '拍攝快照',
+    opticalScan: '光學智能掃瞄',
+    analyzingSnapshot: 'AI 視覺識別成分中...',
+    takeMealPhoto: '拍攝/上傳餐點照片',
+    scanMealDesc: '智能掃瞄餐盤並由 Gemini AI 自動識別成分卡路里',
+    storageHousekeeping: '儲存與快取清理',
+    monetizationPlans: '訂閱會員與服務',
+    selectLanguage: '語言選擇 (Language)'
+  },
+  'ja': {
+    appName: 'Vitalstream バイタル',
+    appSubtitle: 'AIヘルス＆バイオメトリクス・トラッカー',
+    dashboard: 'ダッシュボード',
+    analytics: '分析レポート',
+    coachLeo: 'Leo AIコーチ',
+    biometricSensors: '生体センサー',
+    soundscapes: 'サウンドスケープ',
+    storageClean: 'ストレージ削除',
+    proUpgrade: 'Pro版にアップグレード',
+    proUnlimited: 'Pro無制限',
+    credits: 'AIクレジット',
+    logMetric: '記録を追加',
+    todayOverview: '本日のバイオメトリクス概要',
+    calories: '摂取カロリー',
+    water: '水分補給',
+    burn: '消費カロリー',
+    sleep: '睡眠の質',
+    weight: '体重',
+    mood: '気分・メンタル',
+    heartRate: '心拍数',
+    hrv: '心拍変動 HRV',
+    opticalPPGInstructions: '人差し指の腹で背面カメラレンズを完全に覆ってください。赤色光の脈波を検知します。',
+    aiMealInstructions: '食事にかざすか写真をアップロードすると、Gemini AIが栄養素と食材を自動検出します。',
+    fingerWarning: '背面カメラに指が検出されません。指の腹でしっかりカメラレンズを覆ってください。',
+    startLiveStream: 'カメラを起動',
+    stopStream: 'ストリーム停止',
+    snapPhoto: '写真を撮影',
+    opticalScan: '光学スキャン',
+    analyzingSnapshot: 'AI解析中...',
+    takeMealPhoto: '食事写真を撮影/選択',
+    scanMealDesc: 'Gemini AIがプレートをスキャンして栄養素を自動解析',
+    storageHousekeeping: 'ストレージ管理',
+    monetizationPlans: 'プラン＆課金設定',
+    selectLanguage: '言語切替 (Language)'
+  },
+  'ko': {
+    appName: 'Vitalstream 바이탈',
+    appSubtitle: 'AI 헬스 & 생체 데이터 트래커',
+    dashboard: '대시보드',
+    analytics: '데이터 분석',
+    coachLeo: 'Leo AI 코치',
+    biometricSensors: '생체 인식 센서',
+    soundscapes: '사운드스케이프',
+    storageClean: '용량 정리',
+    proUpgrade: 'Pro 업그레이드',
+    proUnlimited: 'Pro 무제한',
+    credits: 'AI 크레딧',
+    logMetric: '기록 추가',
+    todayOverview: '오늘의 생체 데이터 요약',
+    calories: '칼로리 섭취',
+    water: '수분 섭취',
+    burn: '활동 칼로리',
+    sleep: '수면 점수',
+    weight: '체중',
+    mood: '기분 상태',
+    heartRate: '심박수',
+    hrv: '심박 변이도 HRV',
+    opticalPPGInstructions: '검지 손가락 끝으로 후면 카메라 렌즈를 완전히 덮어주세요. 혈류 모세혈관의 맥박을 측정합니다.',
+    aiMealInstructions: '음식을 카메라로 비추거나 사진을 업로드하면 Gemini AI가 칼로리와 영양소를 자동 분석합니다.',
+    fingerWarning: '후면 카메라에 손가락이 감지되지 않았습니다! 후면 렌즈를 밀착해 덮어주세요.',
+    startLiveStream: '카메라 시작',
+    stopStream: '스트림 중지',
+    snapPhoto: '사진 촬영',
+    opticalScan: '광학 스캔',
+    analyzingSnapshot: 'AI 영양 성분 분석 중...',
+    takeMealPhoto: '식단 사진 촬영/업로드',
+    scanMealDesc: 'Gemini AI가 음식을 인식하여 영양소 및 칼로리를 산출합니다',
+    storageHousekeeping: '저장 공간 및 정리',
+    monetizationPlans: '요금제 및 멤버십',
+    selectLanguage: '언어 선택 (Language)'
+  },
+  'km': {
+    appName: 'Vitalstream វ៉ៃថលស្ទ្រីម',
+    appSubtitle: 'AI តាមដានសុខភាព & ជីវមាត្រ',
+    dashboard: 'ផ្ទាំងគ្រប់គ្រង',
+    analytics: 'ការវិភាគ',
+    coachLeo: 'គ្រូបង្វឹក AI Leo',
+    biometricSensors: 'សែនស័រជីវមាត្រ',
+    soundscapes: 'សំឡេងព្យាបាល',
+    storageClean: 'សម្អាតអង្គចងចាំ',
+    proUpgrade: 'អាប់គ្រេដទៅ Pro',
+    proUnlimited: 'Pro មិនកំណត់',
+    credits: 'ក្រេឌីត AI',
+    logMetric: 'កត់ត្រាសុខភាព',
+    todayOverview: 'សង្ខេបសុខភាពថ្ងៃនេះ',
+    calories: 'កាឡូរីអាហារ',
+    water: 'ការពិសារទឹក',
+    burn: 'កាឡូរីដុតបំផ្លាញ',
+    sleep: 'គុណភាពដំណេក',
+    weight: 'ទម្ងន់រាងកាយ',
+    mood: 'អារម្មណ៍',
+    heartRate: 'ចង្វាក់បេះដូង',
+    hrv: 'សន្ទស្សន៍ HRV',
+    opticalPPGInstructions: 'សូមដាក់ចុងម្រាមដៃចង្អុលបិទលើកញ្ចក់កាមេរ៉ាក្រោយឲ្យជិត។ កាមេរ៉ានឹងវាស់ចង្វាក់ឈាមរត់។',
+    aiMealInstructions: 'តម្រង់កាមេរ៉ាទៅកាន់អាហារ ឬបង្ហោះរូបថត ដើម្បីឲ្យ Gemini AI វិភាគគ្រឿងផ្សំ និងអាហាររូបត្ថម្ភ។',
+    fingerWarning: 'មិនទាន់រកឃើញម្រាមដៃលើកាមេរ៉ាក្រោយទេ! សូមដាក់ម្រាមដៃបិទលើកញ្ចក់កាមេរ៉ាក្រោយឲ្យជិត។',
+    startLiveStream: 'បើកកាមេរ៉ា',
+    stopStream: 'បិទកាមេរ៉ា',
+    snapPhoto: 'ថតរូប',
+    opticalScan: 'ស្កែនពន្លឺ',
+    analyzingSnapshot: 'AI កំពុងវិភាគគ្រឿងផ្សំអាហារ...',
+    takeMealPhoto: 'ថតរូប/បង្ហោះរូបអាហារ',
+    scanMealDesc: 'ស្កែនអាហារ និងវិភាគកាឡូរីស្វ័យប្រវត្តិដោយ Gemini AI',
+    storageHousekeeping: 'ការគ្រប់គ្រងអង្គចងចាំ',
+    monetizationPlans: 'កញ្ចប់សេវាកម្ម & ការជាវ',
+    selectLanguage: 'ជ្រើសរើសភាសា (Language)'
+  }
+};
