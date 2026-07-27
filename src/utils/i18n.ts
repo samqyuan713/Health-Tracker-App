@@ -48,6 +48,31 @@ export interface TranslationDictionary {
   quickEntry: string;
   foodIntake: string;
   steps: string;
+  // Extended UI Translations
+  stepsWalked: string;
+  waterIntake: string;
+  energyBurned: string;
+  sleepPattern: string;
+  bodyWeight: string;
+  logHistory: string;
+  customPromptPlaceholder: string;
+  sendMessage: string;
+  quickFitness: string;
+  waterGuide: string;
+  sleepTips: string;
+  reviewLogs: string;
+  generateSoundscape: string;
+  lyriaEngine: string;
+  nowPlaying: string;
+  generateTrack: string;
+  stopMusic: string;
+  saveSessionLog: string;
+  closeModal: string;
+  confirm: string;
+  cancel: string;
+  save: string;
+  edit: string;
+  delete: string;
 }
 
 export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
@@ -98,7 +123,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     watchSyncActive: 'Watch Sync Active',
     quickEntry: 'Quick Entry Log',
     foodIntake: 'Food Calories',
-    steps: 'Steps Count'
+    steps: 'Steps Count',
+    stepsWalked: 'Steps Walked',
+    waterIntake: 'Water Intake',
+    energyBurned: 'Energy Burned',
+    sleepPattern: 'Sleep Pattern',
+    bodyWeight: 'Body Weight',
+    logHistory: 'Log History',
+    customPromptPlaceholder: 'Ask Coach Leo for health advice, meal plans, or workout routines...',
+    sendMessage: 'Send Message',
+    quickFitness: 'Quick Fitness',
+    waterGuide: 'Water Guide',
+    sleepTips: 'Sleep Tips',
+    reviewLogs: 'Review Logs',
+    generateSoundscape: 'Generate AI Soundscape',
+    lyriaEngine: 'Lyria Music Engine',
+    nowPlaying: 'Now Playing',
+    generateTrack: 'Generate Track',
+    stopMusic: 'Stop Music',
+    saveSessionLog: 'Save Soundscape Session',
+    closeModal: 'Close',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+    save: 'Save',
+    edit: 'Edit',
+    delete: 'Delete'
   },
   'zh-CN': {
     appName: 'Vitalstream 脉动',
@@ -147,7 +196,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     watchSyncActive: '手表实时同步中',
     quickEntry: '快捷打卡',
     foodIntake: '膳食摄入',
-    steps: '运动步数'
+    steps: '运动步数',
+    stepsWalked: '步行步数',
+    waterIntake: '饮水记录',
+    energyBurned: '消耗热量',
+    sleepPattern: '睡眠规律',
+    bodyWeight: '体重变化',
+    logHistory: '打卡历史',
+    customPromptPlaceholder: '向 Leo AI 咨询健康建议、膳食计划或健身方案...',
+    sendMessage: '发送消息',
+    quickFitness: '快速健身',
+    waterGuide: '补水指南',
+    sleepTips: '助眠技巧',
+    reviewLogs: '分析记录',
+    generateSoundscape: '生成 AI 疗愈音效',
+    lyriaEngine: 'Lyria 音乐合成引擎',
+    nowPlaying: '正在播放',
+    generateTrack: '生成曲目',
+    stopMusic: '停止播放',
+    saveSessionLog: '保存音效打卡',
+    closeModal: '关闭',
+    confirm: '确认',
+    cancel: '取消',
+    save: '保存',
+    edit: '编辑',
+    delete: '删除'
   },
   'zh-TW': {
     appName: 'Vitalstream 脈動',
@@ -196,7 +269,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     watchSyncActive: '手錶即時同步中',
     quickEntry: '快捷打卡',
     foodIntake: '膳食攝入',
-    steps: '運動步數'
+    steps: '運動步數',
+    stepsWalked: '步行步數',
+    waterIntake: '飲水記錄',
+    energyBurned: '消耗熱量',
+    sleepPattern: '睡眠規律',
+    bodyWeight: '體重變化',
+    logHistory: '打卡歷史',
+    customPromptPlaceholder: '向 Leo AI 諮詢健康建議、膳食計劃或健身方案...',
+    sendMessage: '發送訊息',
+    quickFitness: '快速健身',
+    waterGuide: '補水指南',
+    sleepTips: '助眠技巧',
+    reviewLogs: '分析記錄',
+    generateSoundscape: '生成 AI 療癒音效',
+    lyriaEngine: 'Lyria 音樂合成引擎',
+    nowPlaying: '正在播放',
+    generateTrack: '生成曲目',
+    stopMusic: '停止播放',
+    saveSessionLog: '保存音效打卡',
+    closeModal: '關閉',
+    confirm: '確認',
+    cancel: '取消',
+    save: '保存',
+    edit: '編輯',
+    delete: '刪除'
   },
   'ja': {
     appName: 'Vitalstream バイタル',
@@ -245,7 +342,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     watchSyncActive: 'スマートウォッチ同期中',
     quickEntry: 'クイック記録',
     foodIntake: '食事カロリー',
-    steps: '歩数'
+    steps: '歩数',
+    stepsWalked: '歩数記録',
+    waterIntake: '水分摂取量',
+    energyBurned: '消費エネルギー',
+    sleepPattern: '睡眠パターン',
+    bodyWeight: '体重推移',
+    logHistory: '記録履歴',
+    customPromptPlaceholder: 'Leo AIに食事プランやトレーニングの相談をする...',
+    sendMessage: '送信',
+    quickFitness: 'フィットネス',
+    waterGuide: '水分ガイド',
+    sleepTips: '睡眠のコツ',
+    reviewLogs: 'ログ分析',
+    generateSoundscape: 'AIサウンド生成',
+    lyriaEngine: 'Lyria 音楽エンジン',
+    nowPlaying: '再生中',
+    generateTrack: 'トラック作成',
+    stopMusic: '停止',
+    saveSessionLog: 'ログに保存',
+    closeModal: '閉じる',
+    confirm: '確認',
+    cancel: 'キャンセル',
+    save: '保存',
+    edit: '編集',
+    delete: '削除'
   },
   'ko': {
     appName: 'Vitalstream 바이탈',
@@ -294,7 +415,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     watchSyncActive: '워치 실시간 동기화 중',
     quickEntry: '빠른 기록',
     foodIntake: '식단 칼로리',
-    steps: '걸음 수'
+    steps: '걸음 수',
+    stepsWalked: '걸음 수 기록',
+    waterIntake: '수분 섭취량',
+    energyBurned: '소모 칼로리',
+    sleepPattern: '수면 패턴',
+    bodyWeight: '체중 변화',
+    logHistory: '기록 내역',
+    customPromptPlaceholder: 'Leo AI에게 운동 루틴이나 식단을 물어보세요...',
+    sendMessage: '전송',
+    quickFitness: '빠른 운동',
+    waterGuide: '수분 가이드',
+    sleepTips: '수면 팁',
+    reviewLogs: '기록 검토',
+    generateSoundscape: 'AI 사운드 생성',
+    lyriaEngine: 'Lyria 음향 엔진',
+    nowPlaying: '현재 재생 중',
+    generateTrack: '트랙 생성',
+    stopMusic: '재생 정지',
+    saveSessionLog: '세션 저장',
+    closeModal: '닫기',
+    confirm: '확인',
+    cancel: '취소',
+    save: '저장',
+    edit: '수정',
+    delete: '삭제'
   },
   'km': {
     appName: 'Vitalstream វ៉ៃថលស្ទ្រីម',
@@ -343,7 +488,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     watchSyncActive: 'បានភ្ជាប់នាឡិកា',
     quickEntry: 'កត់ត្រារហ័ស',
     foodIntake: 'កាឡូរីអាហារ',
-    steps: 'ចំនួនជំហាន'
+    steps: 'ចំនួនជំហាន',
+    stepsWalked: 'ជំហានដើរ',
+    waterIntake: 'ការញ៉ាំទឹក',
+    energyBurned: 'កាឡូរីដុត',
+    sleepPattern: 'លំនាំដំណេក',
+    bodyWeight: 'ទម្ងន់',
+    logHistory: 'ប្រវត្តិកត់ត្រា',
+    customPromptPlaceholder: 'សួរគ្រូបង្វឹក AI Leo អំពីសុខភាព រចនាសម្ព័ន្ធអាហារ ឬលំហាត់ប្រាណ...',
+    sendMessage: 'ផ្ញើសារ',
+    quickFitness: 'លំហាត់រហ័ស',
+    waterGuide: 'ការញ៉ាំទឹក',
+    sleepTips: 'គន្លឹះដំណេក',
+    reviewLogs: 'វិភាគទិន្នន័យ',
+    generateSoundscape: 'បង្កើតសំឡេង AI',
+    lyriaEngine: 'ម៉ាស៊ីនតន្ត្រី Lyria',
+    nowPlaying: 'កំពុងលេង',
+    generateTrack: 'បង្កើតបទចម្រៀង',
+    stopMusic: 'ឈប់លេង',
+    saveSessionLog: 'រក្សាទុកទិន្នន័យ',
+    closeModal: 'បិទ',
+    confirm: 'បញ្ជាក់',
+    cancel: 'បោះបង់',
+    save: 'រក្សាទុក',
+    edit: 'កែប្រែ',
+    delete: 'លុប'
   }
 };
 

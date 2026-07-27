@@ -16,10 +16,12 @@ import {
   Download
 } from 'lucide-react';
 import { MetricLog } from '../types';
+import { getTranslation, SupportedLanguage } from '../utils/i18n';
 
 interface SoundscapesProps {
   onAddLog: (type: MetricLog['type'], value: number, notes?: string) => void;
   selectedDate: string;
+  currentLang?: SupportedLanguage;
 }
 
 interface SongData {
@@ -33,7 +35,8 @@ interface SongData {
   tempo: number;
 }
 
-export default function Soundscapes({ onAddLog, selectedDate }: SoundscapesProps) {
+export default function Soundscapes({ onAddLog, selectedDate, currentLang = 'en' }: SoundscapesProps) {
+  const t = getTranslation(currentLang);
   // Config states
   const [model, setModel] = useState<'lyria' | 'musicfx' | 'gemini'>('lyria');
   const [tempo, setTempo] = useState<number>(60);

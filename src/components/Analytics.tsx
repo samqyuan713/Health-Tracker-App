@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { MetricLog, DailyGoals } from '../types';
 import { getRelativeDateString, getStatsForDay, DEFAULT_GOALS } from '../utils';
+import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { Activity, Droplet, Flame, Moon, Scale, Sparkles, Trophy, Utensils } from 'lucide-react';
 
 interface AnalyticsProps {
   logs: MetricLog[];
   goals: DailyGoals;
+  currentLang?: SupportedLanguage;
 }
 
 type TabType = 'steps' | 'water' | 'calories' | 'sleep' | 'weight' | 'food';
 
-export default function Analytics({ logs, goals }: AnalyticsProps) {
+export default function Analytics({ logs, goals, currentLang = 'en' }: AnalyticsProps) {
+  const t = getTranslation(currentLang);
   const [activeTab, setActiveTab] = useState<TabType>('steps');
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
@@ -22,7 +25,7 @@ export default function Analytics({ logs, goals }: AnalyticsProps) {
     const stats = getStatsForDay(logs, dateStr);
     return {
       date: dateStr,
-      displayDate: new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' }),
+      displayDate: new Date(dateStr + 'T00:00:00').toLocaleDateString(currentLang === 'km' ? 'km-KH' : currentLang === 'zh-CN' ? 'zh-CN' : currentLang === 'ja' ? 'ja-JP' : currentLang === 'ko' ? 'ko-KR' : 'en-US', { weekday: 'short' }),
       value: stats[activeTab] || 0
     };
   });
@@ -34,57 +37,57 @@ export default function Analytics({ logs, goals }: AnalyticsProps) {
   // Metric metadata designed with light color palettes
   const meta: Record<TabType, { label: string; unit: string; color: string; bg: string; target: number; desc: string; icon: any }> = {
     steps: { 
-      label: 'Steps Walked', 
-      unit: 'steps', 
+      label: t.stepsWalked, 
+      unit: t.steps, 
       color: '#10b981', // Emerald-500
       bg: 'rgba(16, 185, 129, 0.08)',
       target: goals.steps,
-      desc: 'Daily step trends this week',
+      desc: t.activityIndex,
       icon: <Activity className="w-5 h-5 text-emerald-600" />
     },
     water: { 
-      label: 'Water Intake', 
+      label: t.waterIntake, 
       unit: 'ml', 
       color: '#0284c7', // Sky-600
       bg: 'rgba(2, 132, 199, 0.08)',
       target: goals.water,
-      desc: 'Liquid hydration logged',
+      desc: t.water,
       icon: <Droplet className="w-5 h-5 text-sky-600" />
     },
     calories: { 
-      label: 'Energy Burned', 
+      label: t.energyBurned, 
       unit: 'kcal', 
       color: '#e11d48', // Rose-600
       bg: 'rgba(225, 29, 72, 0.08)',
       target: goals.calories,
-      desc: 'Active exercise calories burned',
+      desc: t.burn,
       icon: <Flame className="w-5 h-5 text-rose-600" />
     },
     sleep: { 
-      label: 'Nightly Sleep', 
+      label: t.sleepPattern, 
       unit: 'hrs', 
       color: '#4f46e5', // Indigo-600
       bg: 'rgba(79, 70, 229, 0.08)',
       target: goals.sleep,
-      desc: 'Deeper sleep rest cycles',
+      desc: t.sleepQuality,
       icon: <Moon className="w-5 h-5 text-indigo-600" />
     },
     weight: { 
-      label: 'Body Weight', 
+      label: t.bodyWeight, 
       unit: 'kg', 
       color: '#6366f1', // Violet-500
       bg: 'rgba(99, 102, 241, 0.08)',
       target: 74, 
-      desc: 'Recorded weight details',
+      desc: t.weight,
       icon: <Scale className="w-5 h-5 text-indigo-500" />
     },
     food: {
-      label: 'Food Calories',
+      label: t.foodIntake,
       unit: 'kcal',
       color: '#d97706', // Amber-600
       bg: 'rgba(217, 119, 6, 0.08)',
       target: goals.food || 2000,
-      desc: 'Daily food intake calories',
+      desc: t.calories,
       icon: <Utensils className="w-5 h-5 text-amber-600" />
     }
   };

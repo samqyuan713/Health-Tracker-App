@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage, MetricLog } from '../types';
 import { getStatsForDay } from '../utils';
+import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { Send, Sparkles, AlertCircle, Compass, Zap } from 'lucide-react';
 
 interface AICoachProps {
@@ -9,6 +10,7 @@ interface AICoachProps {
   logs: MetricLog[];
   selectedDate: string;
   isGenerating: boolean;
+  currentLang?: SupportedLanguage;
 }
 
 export default function AICoach({ 
@@ -16,8 +18,10 @@ export default function AICoach({
   onSendMessage, 
   logs, 
   selectedDate, 
-  isGenerating 
+  isGenerating,
+  currentLang = 'en'
 }: AICoachProps) {
+  const t = getTranslation(currentLang);
   const [userInput, setUserInput] = useState('');
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
@@ -43,10 +47,10 @@ export default function AICoach({
   };
 
   const quickPrompts = [
-    { text: "📊 Coach, review my health logs progress", tag: "Review Logs" },
-    { text: "💧 How do I reach my daily water intake?", tag: "Water Guide" },
-    { text: "🛌 Sleep hygiene tips for deeper rest", tag: "Sleep Tips" },
-    { text: "🏋️ Suggest a quick 10-minute home workout", tag: "Quick Fitness" }
+    { text: "📊 Coach, review my health logs progress", tag: t.reviewLogs },
+    { text: "💧 How do I reach my daily water intake?", tag: t.waterGuide },
+    { text: "🛌 Sleep hygiene tips for deeper rest", tag: t.sleepTips },
+    { text: "🏋️ Suggest a quick 10-minute home workout", tag: t.quickFitness }
   ];
 
   return (
@@ -61,9 +65,9 @@ export default function AICoach({
         </div>
         <div>
           <div className="flex items-center gap-1.5">
-            <h3 className="text-xs font-black text-slate-800">Coach Leo</h3>
+            <h3 className="text-xs font-black text-slate-800">{t.coachLeo}</h3>
             <span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-emerald-50 text-[8px] font-extrabold text-emerald-700 rounded-md border border-emerald-100">
-              <Sparkles className="w-2.5 h-2.5 text-emerald-600 animate-pulse" /> AI Partner
+              <Sparkles className="w-2.5 h-2.5 text-emerald-600 animate-pulse" /> {t.aiPartner}
             </span>
           </div>
           <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tight">Active Lifestyle Consultant</p>
@@ -171,7 +175,7 @@ export default function AICoach({
             onChange={(e) => setUserInput(e.target.value)}
             onKeyDown={handleKeyPress}
             disabled={isGenerating}
-            placeholder={isGenerating ? "Leo is analyzing your request..." : "Ask Coach Leo anything..."}
+            placeholder={isGenerating ? "Analyzing request..." : t.customPromptPlaceholder}
             className="flex-1 h-11 bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 text-[11px] font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500/80 disabled:opacity-40 transition-all shrink-0 select-text font-medium"
           />
           <button

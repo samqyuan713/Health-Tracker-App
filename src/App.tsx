@@ -448,6 +448,7 @@ export default function App() {
                 <Analytics 
                   logs={logs}
                   goals={goals}
+                  currentLang={currentLang}
                 />
               )}
 
@@ -459,6 +460,7 @@ export default function App() {
                     logs={logs}
                     selectedDate={selectedDate}
                     isGenerating={isGenerating}
+                    currentLang={currentLang}
                   />
                   {/* Quick Reset Chat Option */}
                   {chatHistory.length > 0 && (
@@ -467,7 +469,7 @@ export default function App() {
                       onClick={handleClearHistory}
                       className="absolute top-14 right-4 py-1 px-2.5 bg-slate-800 hover:bg-slate-900 border border-slate-700 text-[8px] font-bold text-white uppercase tracking-wider rounded-lg shadow-md active:scale-95 transition-all z-20 cursor-pointer"
                     >
-                      Reset chat
+                      Reset
                     </button>
                   )}
                 </div>
@@ -485,6 +487,7 @@ export default function App() {
                 <Soundscapes 
                   onAddLog={handleAddLog}
                   selectedDate={selectedDate}
+                  currentLang={currentLang}
                 />
               )}
             </div>
@@ -573,6 +576,7 @@ export default function App() {
               type={modalLogType}
               onClose={() => setModalLogType(null)}
               onSave={handleAddLog}
+              currentLang={currentLang}
             />
 
           </MobileFrame>

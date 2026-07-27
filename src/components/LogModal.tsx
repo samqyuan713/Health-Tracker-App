@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { MetricLog } from '../types';
 import { MOOD_DETAILS } from '../utils';
+import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { X, Activity, Droplet, Flame, Moon, Scale, Smile, Check, Utensils, Camera, RefreshCw, Sparkles } from 'lucide-react';
 
 interface LogModalProps {
   type: MetricLog['type'] | null;
   onClose: () => void;
   onSave: (type: MetricLog['type'], value: number, notes?: string, photo?: string) => void;
+  currentLang?: SupportedLanguage;
 }
 
-export default function LogModal({ type, onClose, onSave }: LogModalProps) {
+export default function LogModal({ type, onClose, onSave, currentLang = 'en' }: LogModalProps) {
+  const t = getTranslation(currentLang);
   const [activeType, setActiveType] = useState<MetricLog['type']>('steps');
   const [value, setValue] = useState<number>(0);
   const [notes, setNotes] = useState<string>('');
