@@ -105,14 +105,23 @@ export default function App() {
     const savedGoals = localStorage.getItem(userKeyGoals);
     const savedChat = localStorage.getItem(userKeyChat);
 
+    const seedIds = new Set(['1','2','3','4','5','6','11','12','13','14','15','16','21','22','23','24','25','26','31','32','33','34','35','36','41','42','43','44','45','46','51','52','53','54','55','56','61','62','64','65','66','f1','f2','f3','f11','f12','f13','f61','f62']);
+
     if (savedLogs) {
       try {
-        setLogs(JSON.parse(savedLogs));
+        const parsed = JSON.parse(savedLogs);
+        if (Array.isArray(parsed)) {
+          const userOnlyLogs = parsed.filter(l => !seedIds.has(l.id));
+          setLogs(userOnlyLogs);
+          localStorage.setItem(userKeyLogs, JSON.stringify(userOnlyLogs));
+        } else {
+          setLogs([]);
+        }
       } catch (e) {
-        setLogs(SEED_LOGS);
+        setLogs([]);
       }
     } else {
-      setLogs(SEED_LOGS);
+      setLogs([]);
     }
 
     if (savedGoals) {
@@ -610,7 +619,7 @@ export default function App() {
                     <p className="text-xs font-bold text-slate-800">Body Temperature</p>
                     <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-tight">Stable baseline</p>
                   </div>
-                  <p className="text-lg font-black text-slate-800 font-mono">98.4°F</p>
+                  <p className="text-lg font-black text-slate-800 font-mono">36.9°C</p>
                 </div>
               </div>
             </div>

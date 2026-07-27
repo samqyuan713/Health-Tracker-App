@@ -3,7 +3,11 @@ import { MetricLog, DailyGoals } from '../types';
 import { 
   formatDatePretty, 
   getStatsForDay, 
-  MOOD_DETAILS 
+  MOOD_DETAILS,
+  calculateReadinessScore,
+  getBiometricAlerts,
+  exportHealthDataCSV,
+  generatePrintableHealthPDF
 } from '../utils';
 import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { 
@@ -15,7 +19,15 @@ import {
   Trash2, 
   Scale,
   Utensils,
-  Camera
+  Camera,
+  Sparkles,
+  ShieldAlert,
+  Sun,
+  Coffee,
+  Brain,
+  Download,
+  Printer,
+  Zap
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -122,6 +134,132 @@ export default function Dashboard({
           &rarr;
         </button>
       </div>
+
+      {/* 1. Body Readiness & Recovery Score Card (Whoop / Oura Competitive Advantage) */}
+      {(() => {
+        const readiness = calculateReadinessScore(stats, goals);
+        const alerts = getBiometricAlerts(stats, goals);
+        return (
+          <div className="flex flex-col gap-3 mb-4">
+            
+            {/* Readiness Score Card */}
+            <div className="bg-gradient-to-br from-emerald-900 via-slate-900 to-teal-950 rounded-2xl p-4 text-white shadow-md relative overflow-hidden border border-emerald-800/40">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+              
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-emerald-400 fill-emerald-400/20" />
+                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-300">{t.recoveryScore}</span>
+                </div>
+                <span className="text-[9px] font-mono font-bold bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 px-2 py-0.5 rounded-full">
+                  Whoop/Oura Grade
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between my-1">
+                <div>
+                  <div className="text-3xl font-black tracking-tight text-white flex items-baseline gap-1">
+                    {readiness.score} <span className="text-xs font-normal text-emerald-300/80">/ 100</span>
+                  </div>
+                  <div className="text-[10px] font-bold text-emerald-200/90 mt-0.5">
+                    {readiness.level === 'peak' ? t.peakReadiness : readiness.level === 'steady' ? t.steadyBalance : t.restRecommended}
+                  </div>
+                </div>
+
+                {/* Circular Score Gauge */}
+                <div className="w-14 h-14 rounded-full border-4 border-emerald-400/30 flex items-center justify-center bg-emerald-950/60 shadow-inner">
+                  <span className="text-sm font-black text-emerald-300">{readiness.score}%</span>
+                </div>
+              </div>
+
+              {/* Actionable Health Report Export Toolbar */}
+              <div className="mt-3 pt-3 border-t border-emerald-800/50 flex items-center justify-between gap-2">
+                <span className="text-[9px] font-bold text-emerald-300/70">{t.healthReportExport}:</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => exportHealthDataCSV(logs)}
+                    className="px-2.5 py-1 bg-emerald-800/40 hover:bg-emerald-800/80 border border-emerald-600/40 rounded-lg text-[9px] font-bold text-emerald-100 flex items-center gap-1 cursor-pointer transition-all active:scale-95"
+                    title={t.exportCSV}
+                  >
+                    <Download className="w-3 h-3 text-emerald-300" /> CSV
+                  </button>
+                  <button
+                    onClick={() => generatePrintableHealthPDF(logs, selectedDate)}
+                    className="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-lg text-[9px] font-black uppercase flex items-center gap-1 cursor-pointer transition-all active:scale-95 shadow-sm"
+                    title={t.exportPDF}
+                  >
+                    <Printer className="w-3 h-3 text-slate-950" /> {t.exportPDF}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Biometric Anomaly & Health Warning Banner */}
+            {alerts.length > 0 ? (
+              <div className="bg-amber-50/90 border border-amber-250 rounded-2xl p-3 flex items-start gap-2.5 shadow-sm">
+                <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-[10px] font-extrabold text-amber-900 uppercase tracking-tight">{t.biometricAnomaly}</h4>
+                  <p className="text-[10px] text-amber-800 font-medium leading-tight mt-0.5">
+                    {alerts.includes('hydrationAlert') && t.hydrationAlert + ' • '}
+                    {alerts.includes('sleepDeficitAlert') && t.sleepDeficitAlert}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl px-3 py-2 flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="text-[10px] font-bold text-emerald-800">{t.allMetricsOptimal}</span>
+              </div>
+            )}
+
+            {/* 3. Circadian Energy & Rhythm Optimizer */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-3 shadow-sm">
+              <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-100">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                  <Sun className="w-3.5 h-3.5 text-amber-500" /> {t.circadianWindows}
+                </span>
+                <span className="text-[8px] font-bold uppercase text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md">Huberman Model</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-[9.5px]">
+                <div className="bg-amber-50/60 border border-amber-100 rounded-xl p-2 flex items-center gap-2">
+                  <Sun className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <div>
+                    <div className="font-extrabold text-slate-800">07:00 - 09:00</div>
+                    <div className="text-[8.5px] font-medium text-slate-500">{t.sunlightExposure}</div>
+                  </div>
+                </div>
+
+                <div className="bg-indigo-50/60 border border-indigo-100 rounded-xl p-2 flex items-center gap-2">
+                  <Brain className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                  <div>
+                    <div className="font-extrabold text-slate-800">10:00 - 14:00</div>
+                    <div className="text-[8.5px] font-medium text-slate-500">{t.peakPerformanceWindow}</div>
+                  </div>
+                </div>
+
+                <div className="bg-rose-50/60 border border-rose-100 rounded-xl p-2 flex items-center gap-2">
+                  <Coffee className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                  <div>
+                    <div className="font-extrabold text-slate-800">14:00 PM</div>
+                    <div className="text-[8.5px] font-medium text-slate-500">{t.caffeineCutoff}</div>
+                  </div>
+                </div>
+
+                <div className="bg-purple-50/60 border border-purple-100 rounded-xl p-2 flex items-center gap-2">
+                  <Moon className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                  <div>
+                    <div className="font-extrabold text-slate-800">21:00 PM</div>
+                    <div className="text-[8.5px] font-medium text-slate-500">{t.melatoninWindow}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        );
+      })()}
 
       {/* Primary Rings grid */}
       <h3 className="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-2">{t.todayOverview}</h3>

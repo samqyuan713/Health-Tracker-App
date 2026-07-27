@@ -15,70 +15,7 @@ export const DEFAULT_GOALS: DailyGoals = {
   food: 2000, // 2000 kcal food intake target
 };
 
-export const SEED_LOGS: MetricLog[] = [
-  // 6 Days Ago
-  { id: '1', timestamp: new Date(getRelativeDateString(6) + 'T08:00:00Z').toISOString(), date: getRelativeDateString(6), type: 'steps', value: 8400, notes: 'Morning walk' },
-  { id: '2', timestamp: new Date(getRelativeDateString(6) + 'T12:00:00Z').toISOString(), date: getRelativeDateString(6), type: 'water', value: 1500 },
-  { id: '3', timestamp: new Date(getRelativeDateString(6) + 'T17:00:00Z').toISOString(), date: getRelativeDateString(6), type: 'calories', value: 420, notes: 'Quick run' },
-  { id: '4', timestamp: new Date(getRelativeDateString(6) + 'T07:00:00Z').toISOString(), date: getRelativeDateString(6), type: 'sleep', value: 7.5, notes: 'Bedtime: 11:30 PM, Wake: 7:00 AM' },
-  { id: '5', timestamp: new Date(getRelativeDateString(6) + 'T21:00:00Z').toISOString(), date: getRelativeDateString(6), type: 'mood', value: 4, notes: 'Felt productive' },
-  { id: '6', timestamp: new Date(getRelativeDateString(6) + 'T09:00:00Z').toISOString(), date: getRelativeDateString(6), type: 'weight', value: 74.2 },
-  { id: 'f1', timestamp: new Date(getRelativeDateString(6) + 'T08:30:00Z').toISOString(), date: getRelativeDateString(6), type: 'food', value: 450, notes: 'Breakfast: Oatmeal & Fruit' },
-  { id: 'f2', timestamp: new Date(getRelativeDateString(6) + 'T13:00:00Z').toISOString(), date: getRelativeDateString(6), type: 'food', value: 680, notes: 'Lunch: Chicken Salad & Quinoa' },
-  { id: 'f3', timestamp: new Date(getRelativeDateString(6) + 'T19:30:00Z').toISOString(), date: getRelativeDateString(6), type: 'food', value: 720, notes: 'Dinner: Salmon & Asparagus' },
-
-  // 5 Days Ago
-  { id: '11', timestamp: new Date(getRelativeDateString(5) + 'T08:00:00Z').toISOString(), date: getRelativeDateString(5), type: 'steps', value: 9200 },
-  { id: '12', timestamp: new Date(getRelativeDateString(5) + 'T12:00:00Z').toISOString(), date: getRelativeDateString(5), type: 'water', value: 2000 },
-  { id: '13', timestamp: new Date(getRelativeDateString(5) + 'T18:00:00Z').toISOString(), date: getRelativeDateString(5), type: 'calories', value: 480, notes: 'HIIT workout' },
-  { id: '14', timestamp: new Date(getRelativeDateString(5) + 'T07:15:00Z').toISOString(), date: getRelativeDateString(5), type: 'sleep', value: 7.0, notes: 'Bedtime: 11:45 PM, Wake: 6:45 AM' },
-  { id: '15', timestamp: new Date(getRelativeDateString(5) + 'T21:00:00Z').toISOString(), date: getRelativeDateString(5), type: 'mood', value: 3, notes: 'Slightly tired' },
-  { id: '16', timestamp: new Date(getRelativeDateString(5) + 'T09:00:00Z').toISOString(), date: getRelativeDateString(5), type: 'weight', value: 73.9 },
-  { id: 'f11', timestamp: new Date(getRelativeDateString(5) + 'T08:15:00Z').toISOString(), date: getRelativeDateString(5), type: 'food', value: 520, notes: 'Breakfast: Avocado Toast & Eggs' },
-  { id: 'f12', timestamp: new Date(getRelativeDateString(5) + 'T12:45:00Z').toISOString(), date: getRelativeDateString(5), type: 'food', value: 610, notes: 'Lunch: Turkey Wrap & Hummus' },
-  { id: 'f13', timestamp: new Date(getRelativeDateString(5) + 'T20:00:00Z').toISOString(), date: getRelativeDateString(5), type: 'food', value: 810, notes: 'Dinner: Beef Stir-fry with Brown Rice' },
-
-  // 4 Days Ago
-  { id: '21', timestamp: new Date(getRelativeDateString(4) + 'T08:00:00Z').toISOString(), date: getRelativeDateString(4), type: 'steps', value: 11500, notes: 'Hit goal early' },
-  { id: '22', timestamp: new Date(getRelativeDateString(4) + 'T12:00:00Z').toISOString(), date: getRelativeDateString(4), type: 'water', value: 2750, notes: 'Feeling hydrated!' },
-  { id: '23', timestamp: new Date(getRelativeDateString(4) + 'T18:30:00Z').toISOString(), date: getRelativeDateString(4), type: 'calories', value: 650, notes: 'Evening basketball' },
-  { id: '24', timestamp: new Date(getRelativeDateString(4) + 'T06:30:00Z').toISOString(), date: getRelativeDateString(4), type: 'sleep', value: 8.2 },
-  { id: '25', timestamp: new Date(getRelativeDateString(4) + 'T21:00:00Z').toISOString(), date: getRelativeDateString(4), type: 'mood', value: 5, notes: 'Excellent energy!' },
-  { id: '26', timestamp: new Date(getRelativeDateString(4) + 'T09:00:00Z').toISOString(), date: getRelativeDateString(4), type: 'weight', value: 73.5 },
-
-  // 3 Days Ago
-  { id: '31', timestamp: new Date(getRelativeDateString(3) + 'T08:00:00Z').toISOString(), date: getRelativeDateString(3), type: 'steps', value: 6000 },
-  { id: '32', timestamp: new Date(getRelativeDateString(3) + 'T12:00:00Z').toISOString(), date: getRelativeDateString(3), type: 'water', value: 1250 },
-  { id: '33', timestamp: new Date(getRelativeDateString(3) + 'T18:30:00Z').toISOString(), date: getRelativeDateString(3), type: 'calories', value: 210, notes: 'Stretch session' },
-  { id: '34', timestamp: new Date(getRelativeDateString(3) + 'T07:30:00Z').toISOString(), date: getRelativeDateString(3), type: 'sleep', value: 6.5 },
-  { id: '35', timestamp: new Date(getRelativeDateString(3) + 'T21:00:00Z').toISOString(), date: getRelativeDateString(3), type: 'mood', value: 2, notes: 'Rest day, felt sluggish' },
-  { id: '36', timestamp: new Date(getRelativeDateString(3) + 'T09:00:00Z').toISOString(), date: getRelativeDateString(3), type: 'weight', value: 73.8 },
-
-  // 2 Days Ago
-  { id: '41', timestamp: new Date(getRelativeDateString(2) + 'T08:00:00Z').toISOString(), date: getRelativeDateString(2), type: 'steps', value: 10400 },
-  { id: '42', timestamp: new Date(getRelativeDateString(2) + 'T12:00:00Z').toISOString(), date: getRelativeDateString(2), type: 'water', value: 2600 },
-  { id: '43', timestamp: new Date(getRelativeDateString(2) + 'T18:30:00Z').toISOString(), date: getRelativeDateString(2), type: 'calories', value: 510 },
-  { id: '44', timestamp: new Date(getRelativeDateString(2) + 'T06:45:00Z').toISOString(), date: getRelativeDateString(2), type: 'sleep', value: 8.0, notes: 'Very deep sleep' },
-  { id: '45', timestamp: new Date(getRelativeDateString(2) + 'T21:00:00Z').toISOString(), date: getRelativeDateString(2), type: 'mood', value: 4 },
-  { id: '46', timestamp: new Date(getRelativeDateString(2) + 'T09:00:00Z').toISOString(), date: getRelativeDateString(2), type: 'weight', value: 73.4 },
-
-  // 1 Day Ago
-  { id: '51', timestamp: new Date(getRelativeDateString(1) + 'T08:00:00Z').toISOString(), date: getRelativeDateString(1), type: 'steps', value: 8800 },
-  { id: '52', timestamp: new Date(getRelativeDateString(1) + 'T12:00:00Z').toISOString(), date: getRelativeDateString(1), type: 'water', value: 2200 },
-  { id: '53', timestamp: new Date(getRelativeDateString(1) + 'T18:30:00Z').toISOString(), date: getRelativeDateString(1), type: 'calories', value: 390 },
-  { id: '54', timestamp: new Date(getRelativeDateString(1) + 'T07:15:00Z').toISOString(), date: getRelativeDateString(1), type: 'sleep', value: 7.2 },
-  { id: '55', timestamp: new Date(getRelativeDateString(1) + 'T21:00:00Z').toISOString(), date: getRelativeDateString(1), type: 'mood', value: 4 },
-  { id: '56', timestamp: new Date(getRelativeDateString(1) + 'T09:00:00Z').toISOString(), date: getRelativeDateString(1), type: 'weight', value: 73.1 },
-
-  // Today (Partial Logs)
-  { id: '61', timestamp: new Date(getRelativeDateString(0) + 'T08:30:00Z').toISOString(), date: getRelativeDateString(0), type: 'steps', value: 4200, notes: 'Morning commute' },
-  { id: '62', timestamp: new Date(getRelativeDateString(0) + 'T10:15:00Z').toISOString(), date: getRelativeDateString(0), type: 'water', value: 800 },
-  { id: '64', timestamp: new Date(getRelativeDateString(0) + 'T06:30:00Z').toISOString(), date: getRelativeDateString(0), type: 'sleep', value: 7.8, notes: 'Bedtime: 11:30 PM, Wake: 7:18 AM' },
-  { id: '65', timestamp: new Date(getRelativeDateString(0) + 'T11:00:00Z').toISOString(), date: getRelativeDateString(0), type: 'mood', value: 4 },
-  { id: '66', timestamp: new Date(getRelativeDateString(0) + 'T07:30:00Z').toISOString(), date: getRelativeDateString(0), type: 'weight', value: 72.8 },
-  { id: 'f61', timestamp: new Date(getRelativeDateString(0) + 'T08:45:00Z').toISOString(), date: getRelativeDateString(0), type: 'food', value: 480, notes: 'Eggs, Spinach & Black Coffee' },
-  { id: 'f62', timestamp: new Date(getRelativeDateString(0) + 'T12:30:00Z').toISOString(), date: getRelativeDateString(0), type: 'food', value: 580, notes: 'Tofu & Noodle Salad bowl' }
-];
+export const SEED_LOGS: MetricLog[] = [];
 
 export function getStatsForDay(logs: MetricLog[], dateStr: string) {
   const dayLogs = logs.filter(l => l.date === dateStr);
@@ -124,3 +61,136 @@ export const MOOD_DETAILS: Record<number, { emoji: string; label: string; bg: st
   4: { emoji: '🙂', label: 'Good', bg: 'bg-green-50', text: 'text-green-600' },
   5: { emoji: '😆', label: 'Excellent', bg: 'bg-emerald-50', text: 'text-emerald-500' },
 };
+
+// Advanced Body Readiness & Recovery Score (0 - 100)
+export function calculateReadinessScore(stats: ReturnType<typeof getStatsForDay>, goals: DailyGoals = DEFAULT_GOALS): {
+  score: number;
+  level: 'peak' | 'steady' | 'rest';
+  color: string;
+} {
+  const sleepRatio = Math.min(1, (stats.sleep || 0) / goals.sleep);
+  const waterRatio = Math.min(1, (stats.water || 0) / goals.water);
+  const moodScore = ((stats.mood || 0) / 5);
+  
+  // If no metrics logged at all, score is 0
+  if (stats.sleep === 0 && stats.water === 0 && stats.mood === 0) {
+    return { score: 0, level: 'rest', color: 'amber' };
+  }
+
+  // Weighted score calculation
+  const totalScore = Math.round((sleepRatio * 40) + (waterRatio * 30) + (moodScore * 30));
+  const finalScore = Math.max(0, Math.min(100, totalScore));
+
+  if (finalScore >= 82) {
+    return { score: finalScore, level: 'peak', color: 'emerald' };
+  } else if (finalScore >= 65) {
+    return { score: finalScore, level: 'steady', color: 'sky' };
+  } else {
+    return { score: finalScore, level: 'rest', color: 'amber' };
+  }
+}
+
+// Biometric Anomaly Detection
+export function getBiometricAlerts(stats: ReturnType<typeof getStatsForDay>, goals: DailyGoals = DEFAULT_GOALS): string[] {
+  const alerts: string[] = [];
+  if (stats.sleep > 0 && stats.sleep < 6.0) {
+    alerts.push('sleepDeficitAlert');
+  }
+  if (stats.water < goals.water * 0.4) {
+    alerts.push('hydrationAlert');
+  }
+  return alerts;
+}
+
+// CSV Health Data Exporter
+export function exportHealthDataCSV(logs: MetricLog[]) {
+  const headers = ['ID', 'Timestamp', 'Date', 'Type', 'Value', 'Notes'];
+  const rows = logs.map(l => [
+    l.id,
+    l.timestamp,
+    l.date,
+    l.type,
+    l.value,
+    `"${(l.notes || '').replace(/"/g, '""')}"`
+  ]);
+
+  const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `Vitalstream_Health_Report_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// Printable Medical Doctor Summary Report
+export function generatePrintableHealthPDF(logs: MetricLog[], selectedDate: string) {
+  const stats = getStatsForDay(logs, selectedDate);
+  const readiness = calculateReadinessScore(stats);
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Vitalstream Health & Biometric Medical Report</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #1e293b; max-width: 800px; margin: 0 auto; }
+          h1 { color: #059669; font-size: 24px; margin-bottom: 4px; }
+          .subtitle { color: #64748b; font-size: 13px; margin-bottom: 24px; }
+          .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+          .card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; }
+          .metric-val { font-size: 20px; font-weight: 800; color: #0f172a; }
+          .metric-label { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-bottom: 4px; }
+          .score-badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-weight: 800; font-size: 14px; background: #d1fae5; color: #065f46; }
+          table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 12px; }
+          th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; }
+          th { background: #f1f5f9; text-transform: uppercase; font-size: 10px; color: #475569; }
+          .footer { margin-top: 40px; font-size: 10px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+        </style>
+      </head>
+      <body>
+        <h1>Vitalstream Biometric Health Summary</h1>
+        <div class="subtitle">Generated on ${new Date().toLocaleDateString()} | Patient Log Date: ${selectedDate}</div>
+
+        <div class="card" style="margin-bottom: 20px; text-align: center; background: #ecfdf5; border-color: #a7f3d0;">
+          <div class="metric-label">Daily Body Readiness & Recovery Index</div>
+          <div style="font-size: 36px; font-weight: 900; color: #047857;">${readiness.score} / 100</div>
+          <div class="score-badge">${readiness.level.toUpperCase()} READINESS</div>
+        </div>
+
+        <div class="grid">
+          <div class="card"><div class="metric-label">Steps Walked</div><div class="metric-val">${stats.steps.toLocaleString()} steps</div></div>
+          <div class="card"><div class="metric-label">Hydration Logged</div><div class="metric-val">${(stats.water/1000).toFixed(1)} L</div></div>
+          <div class="card"><div class="metric-label">Active Calories Burned</div><div class="metric-val">${stats.calories} kcal</div></div>
+          <div class="card"><div class="metric-label">Sleep Rest Duration</div><div class="metric-val">${stats.sleep} hrs</div></div>
+        </div>
+
+        <h3>Detailed Log Entries (${selectedDate})</h3>
+        <table>
+          <thead>
+            <tr><th>Time</th><th>Metric Type</th><th>Value</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            ${logs.filter(l => l.date === selectedDate).map(l => `
+              <tr>
+                <td>${new Date(l.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                <td style="text-transform: capitalize; font-weight: 600;">${l.type}</td>
+                <td style="font-weight: 700;">${l.value}</td>
+                <td>${l.notes || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="footer">Vitalstream AI Biometric Platform &copy; ${new Date().getFullYear()} — Confidential Medical Health Record</div>
+        <script>window.print();</script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
+

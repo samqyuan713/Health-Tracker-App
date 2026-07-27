@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Wifi, Battery } from 'lucide-react';
 
 interface MobileFrameProps {
   children: React.ReactNode;
@@ -32,14 +31,6 @@ export default function MobileFrame({ children }: MobileFrameProps) {
         {/* Device Status Bar */}
         <div id="phone-status-bar" className="w-full h-8 flex justify-between items-center px-6 relative z-40 select-none text-[10px] font-bold text-slate-800 shrink-0 bg-white border-b border-slate-50">
           <span className="font-bold text-slate-700">{time}</span>
-          <div className="flex items-center gap-1.5">
-            <Wifi className="w-3 h-3 text-slate-700" />
-            <span className="text-[9px] tracking-tight text-slate-500">5G</span>
-            <div className="flex items-center gap-0.5">
-              <span className="text-[9px] text-slate-600">98%</span>
-              <Battery className="w-3.5 h-3.5 text-slate-700 fill-slate-700/20" />
-            </div>
-          </div>
         </div>
 
         {/* Main Application Area (using light theme background) */}

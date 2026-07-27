@@ -73,6 +73,24 @@ export interface TranslationDictionary {
   save: string;
   edit: string;
   delete: string;
+  // Competitive Health Metrics & Features
+  recoveryScore: string;
+  readinessStatus: string;
+  peakReadiness: string;
+  steadyBalance: string;
+  restRecommended: string;
+  circadianWindows: string;
+  caffeineCutoff: string;
+  sunlightExposure: string;
+  peakPerformanceWindow: string;
+  melatoninWindow: string;
+  healthReportExport: string;
+  exportCSV: string;
+  exportPDF: string;
+  biometricAnomaly: string;
+  allMetricsOptimal: string;
+  hydrationAlert: string;
+  sleepDeficitAlert: string;
 }
 
 export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
@@ -147,7 +165,24 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     cancel: 'Cancel',
     save: 'Save',
     edit: 'Edit',
-    delete: 'Delete'
+    delete: 'Delete',
+    recoveryScore: 'Daily Recovery & Readiness Score',
+    readinessStatus: 'Body Readiness',
+    peakReadiness: 'Peak Athletic State (High Recovery)',
+    steadyBalance: 'Balanced Recovery (Moderate Load)',
+    restRecommended: 'Active Recovery Recommended (Low Energy)',
+    circadianWindows: 'Circadian Energy & Rhythm Optimizer',
+    caffeineCutoff: 'Caffeine Cutoff Window',
+    sunlightExposure: 'Morning Sunlight Window',
+    peakPerformanceWindow: 'Peak Mental Focus Window',
+    melatoninWindow: 'Melatonin Elevation Phase',
+    healthReportExport: 'Export Health Report',
+    exportCSV: 'Export Raw Data (CSV)',
+    exportPDF: 'Print Doctor Medical Report',
+    biometricAnomaly: 'Biometric Anomaly & Alert System',
+    allMetricsOptimal: 'All Biometric Indicators Optimal',
+    hydrationAlert: 'Hydration Deficit Warning',
+    sleepDeficitAlert: 'Sleep Recovery Deficit Warning'
   },
   'zh-CN': {
     appName: 'Vitalstream 脉动',
@@ -220,7 +255,24 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     cancel: '取消',
     save: '保存',
     edit: '编辑',
-    delete: '删除'
+    delete: '删除',
+    recoveryScore: '每日恢复与准备度得分',
+    readinessStatus: '身体状态',
+    peakReadiness: '巅峰体能状态 (高度恢复)',
+    steadyBalance: '平稳均衡状态 (中等负荷)',
+    restRecommended: '建议主动恢复 (能量较低)',
+    circadianWindows: '昼夜节律与能量窗口优化',
+    caffeineCutoff: '咖啡因截止时间窗口',
+    sunlightExposure: '晨间阳光照射最佳窗口',
+    peakPerformanceWindow: '大脑高效专注窗口',
+    melatoninWindow: '褪黑素自然分泌期',
+    healthReportExport: '导出健康报告',
+    exportCSV: '导出原始数据 (CSV)',
+    exportPDF: '打印医生诊疗健康报告',
+    biometricAnomaly: '生物体征异常预警系统',
+    allMetricsOptimal: '所有生物体征指标处于最佳状态',
+    hydrationAlert: '水分摄入不足预警',
+    sleepDeficitAlert: '睡眠恢复赤字预警'
   },
   'zh-TW': {
     appName: 'Vitalstream 脈動',
@@ -293,7 +345,24 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     cancel: '取消',
     save: '保存',
     edit: '編輯',
-    delete: '刪除'
+    delete: '刪除',
+    recoveryScore: '每日恢復與準備度得分',
+    readinessStatus: '身體狀態',
+    peakReadiness: '巔峰體能狀態 (高度恢復)',
+    steadyBalance: '平穩均衡狀態 (中等負荷)',
+    restRecommended: '建議主動恢復 (能量較低)',
+    circadianWindows: '晝夜節律與能量窗口優化',
+    caffeineCutoff: '咖啡因截止時間窗口',
+    sunlightExposure: '晨間陽光照射最佳窗口',
+    peakPerformanceWindow: '大腦高效專注窗口',
+    melatoninWindow: '褪黑素自然分泌期',
+    healthReportExport: '導出健康報告',
+    exportCSV: '導出原始數據 (CSV)',
+    exportPDF: '列印醫生診療健康報告',
+    biometricAnomaly: '生物體徵異常預警系統',
+    allMetricsOptimal: '所有生物體徵指標處於最佳狀態',
+    hydrationAlert: '水分攝入不足預警',
+    sleepDeficitAlert: '睡眠恢復赤字預警'
   },
   'ja': {
     appName: 'Vitalstream バイタル',
@@ -366,7 +435,24 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     cancel: 'キャンセル',
     save: '保存',
     edit: '編集',
-    delete: '削除'
+    delete: '削除',
+    recoveryScore: 'リカバリー＆コンディションスコア',
+    readinessStatus: 'コンディション状態',
+    peakReadiness: '最高のコンディション (高回復)',
+    steadyBalance: 'バランス良好 (標準負荷)',
+    restRecommended: 'アクティブリカバリー推奨 (エネルギー低)',
+    circadianWindows: 'サーカディアンリズム＆エネルギー最適化',
+    caffeineCutoff: 'カフェイン摂取終了時間',
+    sunlightExposure: '朝の日光浴最適時間帯',
+    peakPerformanceWindow: '集中力・パフォーマンス最高時間帯',
+    melatoninWindow: 'メラトニン自然分泌期',
+    healthReportExport: 'ヘルスレポート出力',
+    exportCSV: '生データを出力 (CSV)',
+    exportPDF: '医師提出用医療レポート印刷',
+    biometricAnomaly: 'バイオメトリクス異常検知アラート',
+    allMetricsOptimal: 'すべての生体指標が最適状態です',
+    hydrationAlert: '水分不足警告',
+    sleepDeficitAlert: '睡眠不足リカバリー警告'
   },
   'ko': {
     appName: 'Vitalstream 바이탈',
@@ -439,7 +525,24 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     cancel: '취소',
     save: '저장',
     edit: '수정',
-    delete: '삭제'
+    delete: '삭제',
+    recoveryScore: '일일 회복 및 컨디션 점수',
+    readinessStatus: '신체 상태',
+    peakReadiness: '최상의 활력 상태 (높은 회복도)',
+    steadyBalance: '균형 잡힌 회복 (보통 부하)',
+    restRecommended: '휴식 및 능동적 회복 권장 (에너지 낮음)',
+    circadianWindows: '생체 리듬 및 에너지 최적화',
+    caffeineCutoff: '카페인 섭취 중단 권장 시간',
+    sunlightExposure: '아침 햇빛 쬐기 최적 시간대',
+    peakPerformanceWindow: '최대 집중 및 인지 능력 시간대',
+    melatoninWindow: '멜라토닌 자연 분비 시간대',
+    healthReportExport: '건강 리포트 내보내기',
+    exportCSV: '원본 데이터 내보내기 (CSV)',
+    exportPDF: '의사 진료용 건강 리포트 인쇄',
+    biometricAnomaly: '생체 이상 신호 및 감지 시스템',
+    allMetricsOptimal: '모든 생체 지표가 최적 상태입니다',
+    hydrationAlert: '수분 부족 주의 경고',
+    sleepDeficitAlert: '수면 적자 회복 필요 경고'
   },
   'km': {
     appName: 'Vitalstream វ៉ៃថលស្ទ្រីម',
@@ -512,7 +615,24 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     cancel: 'បោះបង់',
     save: 'រក្សាទុក',
     edit: 'កែប្រែ',
-    delete: 'លុប'
+    delete: 'លុប',
+    recoveryScore: 'ពិន្ទុស្ដារថាមពល & ភាពរួចរាល់ប្រចាំថ្ងៃ',
+    readinessStatus: 'ស្ថានភាពរាងកាយ',
+    peakReadiness: 'កម្រិតថាមពលកំពូល (ការស្ដារឡើងវិញខ្ពស់)',
+    steadyBalance: 'ថាមពលមានសមតុល្យ (កម្រិតមធ្យម)',
+    restRecommended: 'គួរសម្រាកស្តារថាមពល (ថាមពលទាប)',
+    circadianWindows: 'ការកំណត់ពេលវេលាថាមពលរាងកាយ Circadian',
+    caffeineCutoff: 'ម៉ោងឈប់ញ៉ាំកាហ្វេអ៊ីន',
+    sunlightExposure: 'ម៉ោងហាលពន្លឺថ្ងៃព្រឹក',
+    peakPerformanceWindow: 'ម៉ោងខួរក្បាលធ្វើការមានប្រសិទ្ធភាពខ្ពស់',
+    melatoninWindow: 'ដំណាក់កាលបញ្ចេញ Melatonin ធម្មជាតិ',
+    healthReportExport: 'ទាញយករាយការណ៍សុខភាព',
+    exportCSV: 'ទាញយកទិន្នន័យ (CSV)',
+    exportPDF: 'បោះពុម្ពរបាយការណ៍វេជ្ជសាស្ត្រ',
+    biometricAnomaly: 'ប្រព័ន្ធប្រកាសអាសន្នជីវមាត្រ',
+    allMetricsOptimal: 'សន្ទស្សន៍ជីវមាត្រទាំងអស់ស្ថិតក្នុងកម្រិតល្អប្រសើរ',
+    hydrationAlert: 'ការប្រកាសអាសន្ន៖ កង្វះជាតិទឹក',
+    sleepDeficitAlert: 'ការប្រកាសអាសន្ន៖ ស្ទើរដំណេក'
   }
 };
 
