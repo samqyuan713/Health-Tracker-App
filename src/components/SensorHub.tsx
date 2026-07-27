@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MetricLog } from '../types';
+import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { 
   Camera, 
   Activity, 
@@ -21,9 +22,11 @@ import {
 interface SensorHubProps {
   onAddLog: (type: MetricLog['type'], value: number, notes?: string, photo?: string) => void;
   selectedDate: string;
+  currentLang?: SupportedLanguage;
 }
 
-export default function SensorHub({ onAddLog, selectedDate }: SensorHubProps) {
+export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }: SensorHubProps) {
+  const t = getTranslation(currentLang);
   const [sensorTab, setSensorTab] = useState<'optical' | 'audio' | 'gravity' | 'gps'>('optical');
   
   // Lens & Video state
@@ -830,15 +833,9 @@ export default function SensorHub({ onAddLog, selectedDate }: SensorHubProps) {
               <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-2 text-[9px] text-slate-600 font-medium flex items-start gap-1.5 select-none">
                 <span className="text-base leading-none">💡</span>
                 <div>
-                  {cameraMode === 'pulse' ? (
-                    <p>
-                      <strong className="font-extrabold text-slate-800 uppercase">Optical PPG Pulse Instructions:</strong> Cover the <span className="text-rose-600 font-bold underline">rear camera lens</span> on the back of your phone/device with your index fingertip. The camera reads subtle red brightness pulses caused by capillary blood flow. <em>Note: Touching the screen glass will not register pulse.</em>
-                    </p>
-                  ) : (
-                    <p>
-                      <strong className="font-extrabold text-slate-800 uppercase">AI Meal Scanner Instructions:</strong> Point camera at your food plate or tap <span className="text-amber-800 font-bold">Snap Photo</span>. Tap <span className="text-emerald-700 font-bold">Optical Scan</span> to run Gemini AI Vision to automatically identify dish ingredients, calories, and macros.
-                    </p>
-                  )}
+                  <p>
+                    {cameraMode === 'pulse' ? t.opticalPPGInstructions : t.aiMealInstructions}
+                  </p>
                 </div>
               </div>
 
@@ -850,7 +847,7 @@ export default function SensorHub({ onAddLog, selectedDate }: SensorHubProps) {
                       onClick={startCameraStream}
                       className="flex-1 py-2.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-150 rounded-xl text-[9px] font-black uppercase text-indigo-700 cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1 shadow-sm"
                     >
-                      Enable Live Camera
+                      {t.startLiveStream}
                     </button>
                   )}
 
@@ -860,7 +857,7 @@ export default function SensorHub({ onAddLog, selectedDate }: SensorHubProps) {
                       className="py-2.5 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-[9px] font-black uppercase text-slate-500 cursor-pointer transition-all active:scale-95"
                       title="Shut optical pipeline"
                     >
-                      Kill Stream
+                      {t.stopStream}
                     </button>
                   )}
 
@@ -869,7 +866,7 @@ export default function SensorHub({ onAddLog, selectedDate }: SensorHubProps) {
                     className="py-2.5 px-3 bg-amber-50 hover:bg-amber-100 border border-amber-250 rounded-xl text-[9px] font-black uppercase text-amber-800 cursor-pointer transition-all active:scale-95 flex items-center gap-1 shadow-sm"
                     title="Upload or take photo via device camera"
                   >
-                    📷 Snap Photo
+                    📷 {t.snapPhoto}
                   </button>
 
                   <input
@@ -892,11 +889,11 @@ export default function SensorHub({ onAddLog, selectedDate }: SensorHubProps) {
                   >
                     {scanStatus === 'scanning' ? (
                       <>
-                        <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Scanning ({scanProgress}%)
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" /> {t.analyzingSnapshot} ({scanProgress}%)
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-3.5 h-3.5" /> Start Optical Scan
+                        <Sparkles className="w-3.5 h-3.5 text-amber-300" /> {t.opticalScan}
                       </>
                     )}
                   </button>

@@ -5,6 +5,7 @@ import {
   getStatsForDay, 
   MOOD_DETAILS 
 } from '../utils';
+import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { 
   Activity, 
   Droplet, 
@@ -25,6 +26,7 @@ interface DashboardProps {
   onAddLog: (type: MetricLog['type'], value: number, notes?: string, photo?: string) => void;
   onDeleteLog: (id: string) => void;
   onOpenLogModal: (type: MetricLog['type']) => void;
+  currentLang?: SupportedLanguage;
 }
 
 export default function Dashboard({
@@ -34,9 +36,11 @@ export default function Dashboard({
   onNavigateDate,
   onAddLog,
   onDeleteLog,
-  onOpenLogModal
+  onOpenLogModal,
+  currentLang = 'en'
 }: DashboardProps) {
 
+  const t = getTranslation(currentLang);
   const stats = getStatsForDay(logs, selectedDate);
   const dayLogs = logs.filter(l => l.date === selectedDate);
 
@@ -120,7 +124,7 @@ export default function Dashboard({
       </div>
 
       {/* Primary Rings grid */}
-      <h3 className="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-2">Today's Goals</h3>
+      <h3 className="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-2">{t.todayOverview}</h3>
       <div className="grid grid-cols-2 gap-3 mb-4">
         
         {/* Steps Card */}
@@ -131,7 +135,7 @@ export default function Dashboard({
         >
           <div className="flex flex-col justify-between h-full">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight flex items-center gap-1">
-              <Activity className="w-3.5 h-3.5 text-emerald-500" /> Steps
+              <Activity className="w-3.5 h-3.5 text-emerald-500" /> {t.steps}
             </span>
             <div>
               <div className="text-base font-black text-slate-800 tracking-tight">{stats.steps.toLocaleString()}</div>
@@ -151,7 +155,7 @@ export default function Dashboard({
         >
           <div className="flex flex-col justify-between h-full">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight flex items-center gap-1">
-              <Droplet className="w-3.5 h-3.5 text-sky-500" /> Hydration
+              <Droplet className="w-3.5 h-3.5 text-sky-500" /> {t.water}
             </span>
             <div>
               <div className="text-base font-black text-slate-800 tracking-tight">{(stats.water / 1000).toFixed(1)}L</div>
@@ -171,7 +175,7 @@ export default function Dashboard({
         >
           <div className="flex flex-col justify-between h-full">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight flex items-center gap-1">
-              <Flame className="w-3.5 h-3.5 text-rose-500" /> Burn
+              <Flame className="w-3.5 h-3.5 text-rose-500" /> {t.burn}
             </span>
             <div>
               <div className="text-base font-black text-slate-800 tracking-tight">{stats.calories} <span className="text-[10px] font-normal text-slate-500">kcal</span></div>
@@ -191,7 +195,7 @@ export default function Dashboard({
         >
           <div className="flex flex-col justify-between h-full overflow-hidden">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight flex items-center gap-1">
-              <Moon className="w-3.5 h-3.5 text-indigo-500" /> Sleep Pattern
+              <Moon className="w-3.5 h-3.5 text-indigo-500" /> {t.sleep}
             </span>
             <div>
               <div className="text-base font-black text-slate-800 tracking-tight">{stats.sleep} <span className="text-[10px] font-normal text-slate-500">hrs</span></div>
@@ -215,7 +219,7 @@ export default function Dashboard({
             <div>
               <div className="flex justify-between items-center">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight flex items-center gap-1.5">
-                  <Utensils className="w-3.5 h-3.5 text-amber-500" /> Food Intake
+                  <Utensils className="w-3.5 h-3.5 text-amber-500" /> {t.foodIntake}
                 </span>
                 {/* Surface Camera Button */}
                 <button

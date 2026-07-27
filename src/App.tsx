@@ -285,7 +285,7 @@ export default function App() {
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            Watch Sync Active
+            {t.watchSyncActive}
           </div>
           {/* Language / Asian Languages Selector Dropdown */}
           <div className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 p-1 px-2 rounded-2xl border border-slate-200/80 text-[10px] font-bold">
@@ -311,7 +311,7 @@ export default function App() {
             title="Inspect & Clean Local Phone Storage"
           >
             <HardDrive className="w-3.5 h-3.5 text-indigo-600" />
-            <span className="hidden sm:inline">Storage Clean</span>
+            <span className="hidden sm:inline">{t.storageClean}</span>
           </button>
 
           {/* Monetization / Pro Subscription & Pay-As-You-Go Button */}
@@ -324,7 +324,7 @@ export default function App() {
             {userTier === 'payg' && <Zap className="w-3.5 h-3.5 fill-white" />}
             {userTier === 'free' && <Sparkles className="w-3.5 h-3.5" />}
             <span className="hidden sm:inline">
-              {userTier === 'pro' ? 'Pro Unlimited' : userTier === 'payg' ? `Credits: ${paygCredits}` : 'Upgrade Pro'}
+              {userTier === 'pro' ? t.proUnlimited : userTier === 'payg' ? `${t.credits}: ${paygCredits}` : t.proUpgrade}
             </span>
           </button>
           
@@ -338,7 +338,7 @@ export default function App() {
           >
             <div className="text-right">
               <p className="text-[9px] font-extrabold text-emerald-600 uppercase tracking-widest leading-none flex items-center justify-end gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Google ID Connected
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {t.googleIdConnected}
               </p>
               <p className="text-xs font-black text-slate-800 font-sans tracking-tight group-hover:text-emerald-700 transition-colors">
                 {currentUser.name}
@@ -358,11 +358,11 @@ export default function App() {
         <aside className="hidden lg:flex w-72 bg-white border-r border-slate-200 p-6 flex-col justify-between shrink-0 select-none">
           <div className="space-y-6">
             <div>
-              <h3 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-4">Weekly Performance</h3>
+              <h3 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-4">{t.weeklyPerformance}</h3>
               <div className="space-y-4">
                 <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
                   <div className="flex justify-between items-baseline mb-1">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Activity Index</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t.activityIndex}</span>
                     <span className="text-xs font-black text-emerald-600">{weeklyStats.stepsAvg}%</span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-200/70 rounded-full overflow-hidden">
@@ -375,7 +375,7 @@ export default function App() {
                 
                 <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm">
                   <div className="flex justify-between items-baseline mb-1">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Sleep Quality</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t.sleepQuality}</span>
                     <span className="text-xs font-black text-indigo-600">{weeklyStats.sleepAvg}%</span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-200/70 rounded-full overflow-hidden">
@@ -389,9 +389,9 @@ export default function App() {
             </div>
 
             <div className="p-3.5 bg-slate-50 rounded-2xl border border-dashed border-slate-200 shadow-sm">
-              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Compliance Guideline</h4>
+              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{t.complianceGuideline}</h4>
               <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                Aim to maintain your indicators above 80% to ensure sustainable health progress. Keep logging daily stats!
+                {t.complianceDesc}
               </p>
             </div>
           </div>
@@ -401,7 +401,7 @@ export default function App() {
             className="bg-emerald-600 rounded-2xl p-4 text-white hover:bg-emerald-550 transition-all cursor-pointer shadow-md shadow-emerald-600/10"
           >
             <p className="text-[9px] font-extrabold tracking-widest uppercase opacity-85 mb-1 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-white animate-pulse" /> AI Health Partner
+              <Sparkles className="w-3 h-3 text-white animate-pulse" /> {t.aiPartner}
             </p>
             <p className="text-[11px] font-semibold leading-snug">
               "Great work loading steps today! Want a customized meal advisory block? Tap here to ask."
@@ -440,6 +440,7 @@ export default function App() {
                   onAddLog={handleAddLog}
                   onDeleteLog={handleDeleteLog}
                   onOpenLogModal={(type) => setModalLogType(type)}
+                  currentLang={currentLang}
                 />
               )}
 
@@ -476,6 +477,7 @@ export default function App() {
                 <SensorHub 
                   onAddLog={handleAddLog}
                   selectedDate={selectedDate}
+                  currentLang={currentLang}
                 />
               )}
 
@@ -513,7 +515,7 @@ export default function App() {
                 }`}
               >
                 <Heart className={`w-4.5 h-4.5 ${activeTab === 'dashboard' ? 'fill-emerald-600/10 stroke-[2.5px]' : ''}`} />
-                <span className="text-[9px] font-black uppercase tracking-wider">Journal</span>
+                <span className="text-[9px] font-black uppercase tracking-wider">{t.journal}</span>
               </button>
 
               {/* Analytics Tab */}
@@ -525,7 +527,7 @@ export default function App() {
                 }`}
               >
                 <TrendingUp className={`w-4.5 h-4.5 ${activeTab === 'analytics' ? 'stroke-[2.5px]' : ''}`} />
-                <span className="text-[9px] font-black uppercase tracking-wider">Analytics</span>
+                <span className="text-[9px] font-black uppercase tracking-wider">{t.analytics}</span>
               </button>
 
               {/* Sensors & Camera Tab */}
@@ -537,7 +539,7 @@ export default function App() {
                 }`}
               >
                 <Camera className={`w-4.5 h-4.5 ${activeTab === 'sensors' ? 'fill-emerald-600/10 stroke-[2.5px]' : ''}`} />
-                <span className="text-[9px] font-black uppercase tracking-wider">Sensors</span>
+                <span className="text-[9px] font-black uppercase tracking-wider">{t.sensors}</span>
               </button>
 
               {/* AI Soundscape / Music Tab */}
@@ -549,7 +551,7 @@ export default function App() {
                 }`}
               >
                 <Music className={`w-4.5 h-4.5 ${activeTab === 'soundscapes' ? 'fill-emerald-600/10 stroke-[2.5px]' : ''}`} />
-                <span className="text-[9px] font-black uppercase tracking-wider">AI Music</span>
+                <span className="text-[9px] font-black uppercase tracking-wider">{t.soundscapes}</span>
               </button>
 
               {/* Coach Leo Chat Tab */}
@@ -561,7 +563,7 @@ export default function App() {
                 }`}
               >
                 <Sparkles className={`w-4.5 h-4.5 ${activeTab === 'coach-leo' ? 'fill-emerald-600/10 stroke-[2.5px]' : 'animate-pulse'}`} />
-                <span className="text-[9px] font-black uppercase tracking-wider">Coach AI</span>
+                <span className="text-[9px] font-black uppercase tracking-wider">{t.coachLeo}</span>
               </button>
 
             </nav>

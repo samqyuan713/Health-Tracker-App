@@ -35,6 +35,19 @@ export interface TranslationDictionary {
   storageHousekeeping: string;
   monetizationPlans: string;
   selectLanguage: string;
+  weeklyPerformance: string;
+  activityIndex: string;
+  sleepQuality: string;
+  complianceGuideline: string;
+  complianceDesc: string;
+  aiPartner: string;
+  journal: string;
+  sensors: string;
+  googleIdConnected: string;
+  watchSyncActive: string;
+  quickEntry: string;
+  foodIntake: string;
+  steps: string;
 }
 
 export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
@@ -72,7 +85,20 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     scanMealDesc: 'Scans meal & auto-detects ingredients with Gemini AI',
     storageHousekeeping: 'Storage & Housekeeping',
     monetizationPlans: 'Monetization & Plans',
-    selectLanguage: 'Language / 语言 / 言語'
+    selectLanguage: 'Language / 语言 / 言語',
+    weeklyPerformance: 'Weekly Performance',
+    activityIndex: 'Activity Index',
+    sleepQuality: 'Sleep Quality',
+    complianceGuideline: 'Compliance Guideline',
+    complianceDesc: 'Aim to maintain your indicators above 80% to ensure sustainable health progress. Keep logging daily stats!',
+    aiPartner: 'AI Health Partner',
+    journal: 'Journal',
+    sensors: 'Sensors',
+    googleIdConnected: 'Google ID Connected',
+    watchSyncActive: 'Watch Sync Active',
+    quickEntry: 'Quick Entry Log',
+    foodIntake: 'Food Calories',
+    steps: 'Steps Count'
   },
   'zh-CN': {
     appName: 'Vitalstream 脉动',
@@ -108,7 +134,20 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     scanMealDesc: '智能扫描餐盘并由 Gemini AI 自动识别成分卡路里',
     storageHousekeeping: '存储与垃圾清理',
     monetizationPlans: '订阅会员与服务',
-    selectLanguage: '语言选择 (Language)'
+    selectLanguage: '语言选择 (Language)',
+    weeklyPerformance: '本周健康表现',
+    activityIndex: '活动指数',
+    sleepQuality: '睡眠质量',
+    complianceGuideline: '健康达标指南',
+    complianceDesc: '建议保持各项指标在 80% 以上，以确保可持续的健康改善。请坚持每日记录！',
+    aiPartner: 'AI 专属健康伙伴',
+    journal: '日志',
+    sensors: '传感器',
+    googleIdConnected: '已连接 Google 账号',
+    watchSyncActive: '手表实时同步中',
+    quickEntry: '快捷打卡',
+    foodIntake: '膳食摄入',
+    steps: '运动步数'
   },
   'zh-TW': {
     appName: 'Vitalstream 脈動',
@@ -144,7 +183,20 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     scanMealDesc: '智能掃瞄餐盤並由 Gemini AI 自動識別成分卡路里',
     storageHousekeeping: '儲存與快取清理',
     monetizationPlans: '訂閱會員與服務',
-    selectLanguage: '語言選擇 (Language)'
+    selectLanguage: '語言選擇 (Language)',
+    weeklyPerformance: '本週健康表現',
+    activityIndex: '活動指數',
+    sleepQuality: '睡眠品質',
+    complianceGuideline: '健康達標指南',
+    complianceDesc: '建議保持各項指標在 80% 以上，以確保可持續的健康改善。請堅持每日記錄！',
+    aiPartner: 'AI 專屬健康夥伴',
+    journal: '日誌',
+    sensors: '感測器',
+    googleIdConnected: '已連線 Google 帳號',
+    watchSyncActive: '手錶即時同步中',
+    quickEntry: '快捷打卡',
+    foodIntake: '膳食攝入',
+    steps: '運動步數'
   },
   'ja': {
     appName: 'Vitalstream バイタル',
@@ -180,7 +232,20 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     scanMealDesc: 'Gemini AIがプレートをスキャンして栄養素を自動解析',
     storageHousekeeping: 'ストレージ管理',
     monetizationPlans: 'プラン＆課金設定',
-    selectLanguage: '言語切替 (Language)'
+    selectLanguage: '言語切替 (Language)',
+    weeklyPerformance: '今週のパフォーマンス',
+    activityIndex: 'アクティビティ指数',
+    sleepQuality: '睡眠の質',
+    complianceGuideline: 'ヘルスケア目標ガイド',
+    complianceDesc: '各指標を80%以上に維持することで、持続可能な健康改善を実現できます。毎日記録しましょう！',
+    aiPartner: 'AIヘルスパートナー',
+    journal: 'ジャーナル',
+    sensors: 'センサー',
+    googleIdConnected: 'Google ID 連携済み',
+    watchSyncActive: 'スマートウォッチ同期中',
+    quickEntry: 'クイック記録',
+    foodIntake: '食事カロリー',
+    steps: '歩数'
   },
   'ko': {
     appName: 'Vitalstream 바이탈',
@@ -216,7 +281,20 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     scanMealDesc: 'Gemini AI가 음식을 인식하여 영양소 및 칼로리를 산출합니다',
     storageHousekeeping: '저장 공간 및 정리',
     monetizationPlans: '요금제 및 멤버십',
-    selectLanguage: '언어 선택 (Language)'
+    selectLanguage: '언어 선택 (Language)',
+    weeklyPerformance: '주간 활력 성과',
+    activityIndex: '활동 지수',
+    sleepQuality: '수면 점수',
+    complianceGuideline: '건강 준수 가이드',
+    complianceDesc: '목표 지표를 80% 이상 유지하여 지속 가능한 건강 개선을 도모하세요. 매일 기록하세요!',
+    aiPartner: 'AI 전담 건강 파트너',
+    journal: '일지',
+    sensors: '센서',
+    googleIdConnected: 'Google 계정 연결됨',
+    watchSyncActive: '워치 실시간 동기화 중',
+    quickEntry: '빠른 기록',
+    foodIntake: '식단 칼로리',
+    steps: '걸음 수'
   },
   'km': {
     appName: 'Vitalstream វ៉ៃថលស្ទ្រីម',
@@ -252,6 +330,23 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     scanMealDesc: 'ស្កែនអាហារ និងវិភាគកាឡូរីស្វ័យប្រវត្តិដោយ Gemini AI',
     storageHousekeeping: 'ការគ្រប់គ្រងអង្គចងចាំ',
     monetizationPlans: 'កញ្ចប់សេវាកម្ម & ការជាវ',
-    selectLanguage: 'ជ្រើសរើសភាសា (Language)'
+    selectLanguage: 'ជ្រើសរើសភាសា (Language)',
+    weeklyPerformance: 'ប្រសិទ្ធភាពប្រចាំសប្តាហ៍',
+    activityIndex: 'សន្ទស្សន៍សកម្មភាព',
+    sleepQuality: 'គុណភាពដំណេក',
+    complianceGuideline: 'គោលការណ៍ណែនាំស្តង់ដារ',
+    complianceDesc: 'ព្យាយាមរក្សាសន្ទស្សន៍លើសពី 80% ដើម្បីធានាបាននូវការលូតលាស់សុខភាពល្អ។ សូមបន្តកត់ត្រារាល់ថ្ងៃ!',
+    aiPartner: 'ដៃគូសុខភាព AI',
+    journal: 'កំណត់ហេតុ',
+    sensors: 'សែនស័រ',
+    googleIdConnected: 'បានភ្ជាប់ Google ID',
+    watchSyncActive: 'បានភ្ជាប់នាឡិកា',
+    quickEntry: 'កត់ត្រារហ័ស',
+    foodIntake: 'កាឡូរីអាហារ',
+    steps: 'ចំនួនជំហាន'
   }
 };
+
+export function getTranslation(lang: SupportedLanguage = 'en'): TranslationDictionary {
+  return TRANSLATIONS[lang] || TRANSLATIONS['en'];
+}
