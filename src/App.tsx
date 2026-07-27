@@ -8,6 +8,7 @@ import SensorHub from './components/SensorHub';
 import Soundscapes from './components/Soundscapes';
 import AuthModal from './components/AuthModal';
 import StorageHousekeepingModal from './components/StorageHousekeepingModal';
+import ProUpgradeModal from './components/ProUpgradeModal';
 
 import { MetricLog, DailyGoals, ChatMessage, UserProfile } from './types';
 import { SEED_LOGS, DEFAULT_GOALS, getRelativeDateString, getStatsForDay } from './utils';
@@ -20,7 +21,9 @@ import {
   Camera,
   Music,
   UserCheck,
-  HardDrive
+  HardDrive,
+  Crown,
+  Zap
 } from 'lucide-react';
 
 const DEFAULT_USER: UserProfile = {
@@ -46,6 +49,16 @@ export default function App() {
   });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isHousekeepingOpen, setIsHousekeepingOpen] = useState<boolean>(false);
+  
+  // Monetization & Subscription state
+  const [userTier, setUserTier] = useState<'free' | 'pro' | 'payg'>(() => {
+    return (localStorage.getItem('vitalstream_user_tier') as 'free' | 'pro' | 'payg') || 'pro';
+  });
+  const [paygCredits, setPaygCredits] = useState<number>(() => {
+    const saved = localStorage.getItem('vitalstream_payg_credits');
+    return saved ? parseInt(saved, 10) : 30;
+  });
+  const [isProModalOpen, setIsProModalOpen] = useState<boolean>(false);
 
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'coach-leo' | 'sensors' | 'soundscapes'>('dashboard');
@@ -267,6 +280,20 @@ export default function App() {
           >
             <HardDrive className="w-3.5 h-3.5 text-indigo-600" />
             <span className="hidden sm:inline">Storage Clean</span>
+          </button>
+
+          {/* Monetization / Pro Subscription & Pay-As-You-Go Button */}
+          <button
+            onClick={() => setIsProModalOpen(true)}
+            className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white p-2 px-3 rounded-2xl text-[10px] font-black uppercase transition-all active:scale-95 cursor-pointer shadow-sm"
+            title="View Monetization Plans, Pro Subscription & Credits"
+          >
+            {userTier === 'pro' && <Crown className="w-3.5 h-3.5 fill-white" />}
+            {userTier === 'payg' && <Zap className="w-3.5 h-3.5 fill-white" />}
+            {userTier === 'free' && <Sparkles className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">
+              {userTier === 'pro' ? 'Pro Unlimited' : userTier === 'payg' ? `Credits: ${paygCredits}` : 'Upgrade Pro'}
+            </span>
           </button>
           
           <div className="hidden md:block h-6 w-[1px] bg-slate-200"></div>
@@ -606,6 +633,22 @@ export default function App() {
         onUpdateChat={(newChat) => {
           setChatHistory(newChat);
           saveChatToStorage(newChat);
+        }}
+      />
+
+      {/* Monetization & Pro Upgrade Modal */}
+      <ProUpgradeModal 
+        isOpen={isProModalOpen}
+        onClose={() => setIsProModalOpen(false)}
+        currentTier={userTier}
+        credits={paygCredits}
+        onSelectTier={(newTier, newCredits) => {
+          setUserTier(newTier);
+          localStorage.setItem('vitalstream_user_tier', newTier);
+          if (newCredits !== undefined) {
+            setPaygCredits(newCredits);
+            localStorage.setItem('vitalstream_payg_credits', newCredits.toString());
+          }
         }}
       />
 
