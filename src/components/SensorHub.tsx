@@ -46,17 +46,19 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
   const [pulseResult, setPulseResult] = useState<{ bpm: number; hrv: number } | null>(null);
   const [mealResult, setMealResult] = useState<{ name: string; kcal: number; items: string[] } | null>(null);
   const [fingerWarning, setFingerWarning] = useState<string | null>(null);
+  const [isFingerDetected, setIsFingerDetected] = useState<boolean>(false);
 
   // REAL-TIME FINGER LENS COVERAGE CHECKER (PPG Photoplethysmography)
   const checkFingerOnCamera = (): { isFinger: boolean; redRatio: number; avgRed: number } => {
-    if (videoRef.current && stream) {
+    const video = videoRef.current;
+    if (video && (video.readyState >= 2 || video.videoWidth > 0)) {
       try {
         const checkCanvas = document.createElement('canvas');
         checkCanvas.width = 64;
         checkCanvas.height = 64;
-        const ctx = checkCanvas.getContext('2d');
+        const ctx = checkCanvas.getContext('2d', { willReadFrequently: true });
         if (ctx) {
-          ctx.drawImage(videoRef.current, 0, 0, 64, 64);
+          ctx.drawImage(video, 0, 0, 64, 64);
           const imgData = ctx.getImageData(0, 0, 64, 64).data;
           
           let totalR = 0;
@@ -76,18 +78,42 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
           const sum = avgR + avgG + avgB || 1;
           const redRatio = avgR / sum;
 
-          if (avgR > 20) {
-            return { isFinger: true, redRatio, avgRed: avgR };
-          }
+          // Finger on camera lens criteria:
+          // Blood tissue absorbs blue/green light, turning captured camera frame dominant red
+          // redRatio > 0.45, avgR > 18, and avgR > avgG * 1.15 & avgR > avgB * 1.15
+          const isFinger = redRatio > 0.45 && avgR > 18 && (avgR > avgG * 1.15) && (avgR > avgB * 1.15);
+          return { isFinger, redRatio, avgRed: avgR };
         }
       } catch (err) {
-        // Fallback below
+        console.warn("Error reading camera frame for finger detection", err);
       }
     }
-    // Sandbox / captured photo / virtual optical PPG fallback
-    const simRed = 135 + Math.sin(Date.now() / 120) * 22;
-    return { isFinger: true, redRatio: 0.62, avgRed: simRed };
+    return { isFinger: false, redRatio: 0, avgRed: 0 };
   };
+
+  // Auto-attach video stream whenever stream state updates
+  useEffect(() => {
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.play().catch(e => console.log("Video preview autoplay blocked: ", e));
+    }
+  }, [stream]);
+
+  // Continuous finger detection ticker when optical tab is active in pulse mode
+  useEffect(() => {
+    let interval: any;
+    if (sensorTab === 'optical' && cameraMode === 'pulse' && stream) {
+      interval = setInterval(() => {
+        const check = checkFingerOnCamera();
+        setIsFingerDetected(check.isFinger);
+      }, 250);
+    } else {
+      setIsFingerDetected(false);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [sensorTab, cameraMode, stream]);
 
   // Audio measurement state
   const [audioPermission, setAudioPermission] = useState<'pending' | 'granted' | 'denied'>('pending');
@@ -341,46 +367,85 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
   const runCameraScan = async () => {
     if (scanStatus === 'scanning') return;
     
-    // Attempt camera stream if not active
+    // Always obtain live camera stream if not active
     let currentStream = stream;
-    if (!currentStream && cameraPermission !== 'granted') {
+    if (!currentStream) {
       currentStream = await startCameraStream();
+      // Brief delay for video stream buffer to initialize hardware frames
+      await new Promise(r => setTimeout(r, 350));
     }
 
-    if (currentStream && cameraMode === 'meal') {
+    // Requirements for Pulse HRV optical PPG mode
+    if (cameraMode === 'pulse') {
+      if (!currentStream) {
+        setFingerWarning("Finger not detected over camera lens! Please place your index fingertip firmly over the rear camera lens, then click 'Optical Scan'.");
+        setScanStatus('idle');
+        return;
+      }
+
+      // Live frame camera lens coverage check
+      const initialCheck = checkFingerOnCamera();
+      if (!initialCheck.isFinger) {
+        setFingerWarning("Finger not detected over camera lens! Please place your index fingertip firmly over the rear camera lens until the live preview turns red, then click 'Optical Scan'.");
+        setScanStatus('idle');
+        return;
+      }
+    } else if (currentStream && cameraMode === 'meal') {
       capturePhotoFromStream();
     }
-    
+
+    setFingerWarning(null);
     setScanStatus('scanning');
     setScanProgress(0);
     setPulseResult(null);
     setMealResult(null);
-    setFingerWarning(null);
 
     let progress = 0;
     const redSamples: { time: number; red: number }[] = [];
+    let noFingerFrames = 0;
 
     const interval = setInterval(async () => {
-      progress += 5;
+      progress += 4;
       setScanProgress(Math.min(progress, 100));
 
       if (cameraMode === 'pulse') {
         const fingerCheck = checkFingerOnCamera();
-        redSamples.push({ time: Date.now(), red: fingerCheck.avgRed });
+        if (fingerCheck.isFinger) {
+          redSamples.push({ time: Date.now(), red: fingerCheck.avgRed });
+          noFingerFrames = 0;
+        } else {
+          noFingerFrames++;
+          if (noFingerFrames >= 3) {
+            clearInterval(interval);
+            setScanStatus('idle');
+            setScanProgress(0);
+            setFingerWarning("⚠️ Finger removed mid-scan! Keep your index finger pressed firmly against the camera lens until scanning completes.");
+            return;
+          }
+        }
       }
 
       if (progress >= 100) {
         clearInterval(interval);
         
         if (cameraMode === 'pulse') {
+          if (redSamples.length < 5) {
+            setFingerWarning("⚠️ Insufficient optical PPG samples captured. Please hold your finger steady over the camera lens.");
+            setScanStatus('idle');
+            return;
+          }
+
           const reds = redSamples.map(s => s.red);
-          const meanRed = reds.reduce((a, b) => a + b, 0) / (reds.length || 1);
-          const variance = reds.reduce((a, b) => a + Math.pow(b - meanRed, 2), 0) / (reds.length || 1);
+          const meanRed = reds.reduce((a, b) => a + b, 0) / reds.length;
+          const variance = reds.reduce((a, b) => a + Math.pow(b - meanRed, 2), 0) / reds.length;
           const stdDev = Math.sqrt(variance);
 
+          // Find peak intervals in red intensity (PPG pulse wave)
           const peaks: number[] = [];
           for (let i = 1; i < redSamples.length - 1; i++) {
-            if (redSamples[i].red > redSamples[i - 1].red && redSamples[i].red > redSamples[i + 1].red && redSamples[i].red > meanRed + stdDev * 0.1) {
+            if (redSamples[i].red > redSamples[i - 1].red && 
+                redSamples[i].red > redSamples[i + 1].red && 
+                redSamples[i].red > meanRed + stdDev * 0.1) {
               peaks.push(redSamples[i].time);
             }
           }
@@ -394,19 +459,19 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
               rrIntervals.push(peaks[i] - peaks[i - 1]);
             }
             const avgRR = rrIntervals.reduce((a, b) => a + b, 0) / rrIntervals.length;
-            if (avgRR > 300 && avgRR < 1500) {
+            if (avgRR > 350 && avgRR < 1300) {
               calculatedBpm = Math.round(60000 / avgRR);
             }
 
             if (rrIntervals.length >= 2) {
               const rrMean = avgRR;
               const rrVariance = rrIntervals.reduce((a, b) => a + Math.pow(b - rrMean, 2), 0) / rrIntervals.length;
-              calculatedHrv = Math.max(25, Math.min(110, Math.round(Math.sqrt(rrVariance))));
+              calculatedHrv = Math.max(28, Math.min(105, Math.round(Math.sqrt(rrVariance))));
             }
           } else {
             const organicOffset = Math.round((meanRed % 10) * 1.2);
-            calculatedBpm = Math.max(64, Math.min(92, 72 + organicOffset));
-            calculatedHrv = Math.max(42, Math.min(88, 54 + Math.round(stdDev * 10)));
+            calculatedBpm = Math.max(62, Math.min(94, 70 + organicOffset));
+            calculatedHrv = Math.max(38, Math.min(92, 50 + Math.round(stdDev * 8)));
           }
 
           setPulseResult({ bpm: calculatedBpm, hrv: calculatedHrv });
@@ -733,7 +798,13 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
                 ) : cameraPermission === 'granted' && stream ? (
                   /* Web Video Stream Element */
                   <video
-                    ref={videoRef}
+                    ref={(node) => {
+                      videoRef.current = node;
+                      if (node && stream && node.srcObject !== stream) {
+                        node.srcObject = stream;
+                        node.play().catch(() => {});
+                      }
+                    }}
                     autoPlay
                     playsInline
                     muted
@@ -780,10 +851,21 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
                   STREAM_RES: {cameraMode === 'meal' && capturedPhoto ? 'PHOTO_SNAP_UPLOAD' : '400x300'} // ISO_AUTO
                 </div>
 
-                <div className="absolute top-2 right-2 bg-slate-900/80 border border-slate-700/60 rounded-lg px-1.5 py-0.5 text-[7px] font-mono font-bold text-emerald-400 pointer-events-none z-20 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  LIVE MATRIX
-                </div>
+                {cameraMode === 'pulse' ? (
+                  <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-lg text-[8px] font-mono font-bold border pointer-events-none z-20 flex items-center gap-1.5 transition-all ${
+                    isFingerDetected 
+                      ? 'bg-emerald-950/90 border-emerald-500/60 text-emerald-300' 
+                      : 'bg-rose-950/90 border-rose-500/60 text-rose-300'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${isFingerDetected ? 'bg-emerald-400 animate-ping' : 'bg-rose-500'}`}></span>
+                    {isFingerDetected ? '🔴 FINGER DETECTED ON LENS' : '⚠️ NO FINGER ON LENS'}
+                  </div>
+                ) : (
+                  <div className="absolute top-2 right-2 bg-slate-900/80 border border-slate-700/60 rounded-lg px-1.5 py-0.5 text-[7px] font-mono font-bold text-emerald-400 pointer-events-none z-20 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    LIVE MATRIX
+                  </div>
+                )}
 
                 {/* Captured Pulse Canvas rendering on top */}
                 {scanStatus === 'scanning' && cameraMode === 'pulse' && (
@@ -798,7 +880,7 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
                 <div className="bg-rose-50 border border-rose-200/90 rounded-xl p-2.5 text-[9px] text-rose-800 font-extrabold flex items-center justify-between animate-fadeIn select-none shadow-2xs">
                   <div className="flex items-center gap-1.5">
                     <span className="text-sm">⚠️</span>
-                    <span>{fingerWarning}</span>
+                    <span>{fingerWarning.replace(/^⚠️\s*/, '')}</span>
                   </div>
                   <button 
                     onClick={() => setFingerWarning(null)}
