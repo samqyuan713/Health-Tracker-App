@@ -95,7 +95,7 @@ export default function Analytics({ logs, goals, currentLang = 'en' }: Analytics
   const currentMeta = meta[activeTab];
 
   // SVG Dimension constants
-  const svgHeight = 200;
+  const svgHeight = 210;
   const svgWidth = 320;
   const paddingLeft = 32;
   const paddingRight = 12;
