@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -183,8 +183,9 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Body parser
-  app.use(express.json());
+  // Body parser with support for base64 camera image uploads up to 25MB
+  app.use(express.json({ limit: "25mb" }));
+  app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
   // Log level
   console.log("Setting up Express server for Health Tracker app...");
@@ -242,7 +243,6 @@ User question: ${message}
       `;
 
       // Map chatHistory to Gemini API contents structure
-      // Format should fit GoogleGenAI expectations
       const contentsList: any[] = [];
 
       if (chatHistory && Array.isArray(chatHistory)) {
@@ -265,7 +265,7 @@ User question: ${message}
       console.log("Calling Gemini API with Coach Leo persona...");
       const response = await withRetry(() => 
         ai.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-3.7-flash",
           contents: contentsList,
           config: {
             systemInstruction: systemInstruction,
@@ -282,7 +282,7 @@ User question: ${message}
       });
 
     } catch (error: any) {
-      console.log("Health coach session composition fell back to offline helper.");
+      console.error("Health coach error:", error);
       res.status(500).json({ 
         error: "Failed to communicate with Coach Leo", 
         text: "My telemetry link is busy or experiencing high volume. Let's practice a brief breathing check and try again shortly!"
@@ -302,15 +302,10 @@ User question: ${message}
 
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
-        console.warn("GEMINI_API_KEY missing. Using smart fallback for food vision.");
-        res.json({
-          dishName: "Custom Meal Plate",
-          ingredients: ["Fresh greens", "Protein portion", "Complex carbs", "Seasoning"],
-          calories: 480,
-          protein: 24,
-          carbs: 45,
-          fat: 18,
-          summary: "Balanced nutritional meal analyzed offline."
+        console.warn("GEMINI_API_KEY missing for food vision.");
+        res.status(400).json({
+          error: "API_KEY_MISSING",
+          message: "GEMINI_API_KEY is required for AI Food Vision. Please add it in AI Studio Settings > Secrets panel."
         });
         return;
       }
@@ -324,45 +319,61 @@ User question: ${message}
         }
       });
 
-      const mimeType = imageBase64.startsWith("data:image/png") ? "image/png" : "image/jpeg";
-      const cleanData = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+      // Parse MIME type and clean Base64 data safely
+      let mimeType = "image/jpeg";
+      let cleanData = imageBase64;
+      const dataUriMatch = imageBase64.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,(.+)$/);
+      if (dataUriMatch) {
+        mimeType = dataUriMatch[1];
+        cleanData = dataUriMatch[2];
+      }
 
       const systemInstruction = 
         "You are an expert AI Nutritionist and Food Vision Specialist.\n" +
-        "Analyze the food photo provided and identify:\n" +
-        "1. Dish Name\n" +
-        "2. List of key ingredients visible or inferred in the dish\n" +
-        "3. Estimated total calories (kcal)\n" +
-        "4. Macronutrients estimate (protein in g, carbs in g, fat in g)\n" +
-        "5. A short 1-sentence health summary.\n" +
-        "Return valid JSON matching this structure:\n" +
-        "{\n" +
-        "  \"dishName\": \"string\",\n" +
-        "  \"ingredients\": [\"string\", \"string\", \"string\"],\n" +
-        "  \"calories\": 520,\n" +
-        "  \"protein\": 28,\n" +
-        "  \"carbs\": 42,\n" +
-        "  \"fat\": 18,\n" +
-        "  \"summary\": \"string\"\n" +
-        "}";
+        "Carefully analyze the specific food/drink items in the provided photo.\n" +
+        "Identify:\n" +
+        "1. dishName: Exact dish or meal name (e.g. 'Avocado Toast with Poached Egg', 'Grilled Salmon with Quinoa', 'Pepperoni Pizza Slice')\n" +
+        "2. ingredients: An array of specific, distinct visible ingredients and components\n" +
+        "3. calories: A realistic numeric estimate of the total calories (kcal) for the photographed portion (e.g., 280, 560, 850)\n" +
+        "4. protein: Estimated protein in grams (integer)\n" +
+        "5. carbs: Estimated carbohydrates in grams (integer)\n" +
+        "6. fat: Estimated fat in grams (integer)\n" +
+        "7. summary: A concise 1-sentence nutritional insight highlighting key macronutrients or micronutrient benefits.";
 
-      console.log("Calling Gemini Vision for food ingredient detection...");
+      console.log(`Calling Gemini Vision (gemini-3.7-flash) with ${mimeType} image for nutrition analysis...`);
       const response = await withRetry(() => 
         ai.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-3.7-flash",
           contents: [
             {
               role: "user",
               parts: [
                 { inlineData: { mimeType, data: cleanData } },
-                { text: "Identify the food item in this picture, list all ingredients, and estimate its nutrition and calories." }
+                { text: "Analyze this meal photo in detail. Accurately identify the exact food item, list its specific visible ingredients, and calculate realistic calories and macronutrients for this specific plate." }
               ]
             }
           ],
           config: {
             systemInstruction: systemInstruction,
             responseMimeType: "application/json",
-            temperature: 0.2,
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                dishName: { type: Type.STRING, description: "Name of the dish or meal" },
+                ingredients: { 
+                  type: Type.ARRAY, 
+                  items: { type: Type.STRING },
+                  description: "List of identified ingredients"
+                },
+                calories: { type: Type.NUMBER, description: "Estimated total calories in kcal" },
+                protein: { type: Type.NUMBER, description: "Estimated grams of protein" },
+                carbs: { type: Type.NUMBER, description: "Estimated grams of carbohydrates" },
+                fat: { type: Type.NUMBER, description: "Estimated grams of fat" },
+                summary: { type: Type.STRING, description: "One sentence nutritional summary" }
+              },
+              required: ["dishName", "ingredients", "calories", "protein", "carbs", "fat", "summary"]
+            },
+            temperature: 0.1,
           }
         })
       );
@@ -371,25 +382,20 @@ User question: ${message}
       const visionResult = JSON.parse(rawText);
 
       res.json({
-        dishName: visionResult.dishName || "Healthy Meal Plate",
-        ingredients: visionResult.ingredients || ["Main Protein", "Mixed Vegetables", "Grains"],
-        calories: visionResult.calories || 450,
-        protein: visionResult.protein || 22,
-        carbs: visionResult.carbs || 40,
-        fat: visionResult.fat || 15,
-        summary: visionResult.summary || "Balanced meal with protein and healthy fats."
+        dishName: visionResult.dishName || "Analyzed Meal",
+        ingredients: Array.isArray(visionResult.ingredients) ? visionResult.ingredients : ["Main dish"],
+        calories: Number(visionResult.calories) || 400,
+        protein: Number(visionResult.protein) || 20,
+        carbs: Number(visionResult.carbs) || 35,
+        fat: Number(visionResult.fat) || 12,
+        summary: visionResult.summary || "Balanced meal analyzed by Gemini Vision."
       });
 
     } catch (error: any) {
-      console.log("Food vision endpoint fallback.");
-      res.json({
-        dishName: "Captured Meal Plate",
-        ingredients: ["Whole foods", "Fresh ingredients", "Protein & Veggies"],
-        calories: 450,
-        protein: 20,
-        carbs: 45,
-        fat: 16,
-        summary: "Nutritious balanced plate detected."
+      console.error("Food vision endpoint error:", error);
+      res.status(500).json({
+        error: "FOOD_VISION_FAILED",
+        message: error?.message || "Failed to analyze food photo with AI Vision. Please try again."
       });
     }
   });
@@ -457,7 +463,7 @@ Acoustic Theme: ${style || "Piano and Strings"}
       console.log("Calling Gemini API for custom songwriter composition...");
       const response = await withRetry(() => 
         ai.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-3.7-flash",
           contents: [{ role: "user", parts: [{ text: userPrompt }] }],
           config: {
             systemInstruction: systemInstruction,
