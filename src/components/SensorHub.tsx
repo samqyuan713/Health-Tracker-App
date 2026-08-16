@@ -18,7 +18,8 @@ import {
   Eye,
   Info,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  AlertCircle
 } from 'lucide-react';
 
 interface SensorHubProps {
@@ -56,6 +57,7 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
     fat?: number;
     summary?: string;
   } | null>(null);
+  const [mealError, setMealError] = useState<string | null>(null);
   const [fingerWarning, setFingerWarning] = useState<string | null>(null);
   const [isFingerDetected, setIsFingerDetected] = useState<boolean>(false);
 
@@ -311,6 +313,7 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
     setScanProgress(20);
     setPulseResult(null);
     setMealResult(null);
+    setMealError(null);
 
     const progressInterval = setInterval(() => {
       setScanProgress((prev) => {
@@ -333,44 +336,71 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
         const data = await response.json();
         setMealResult({
           name: data.dishName || 'AI Analyzed Meal Plate',
-          kcal: data.calories || 480,
+          kcal: Number(data.calories) || 400,
           items: data.ingredients && data.ingredients.length > 0 ? data.ingredients : ["Protein Portion", "Fresh Vegetables", "Complex Carbs"],
           protein: data.protein,
           carbs: data.carbs,
           fat: data.fat,
           summary: data.summary
         });
+        setMealError(null);
         setScanStatus('complete');
         return;
       } else {
-        throw new Error('AI Vision API response error');
+        const errData = await response.json().catch(() => ({}));
+        if (errData.error === 'API_KEY_MISSING') {
+          throw new Error('GEMINI_API_KEY is not configured in Settings > Secrets.');
+        }
+        throw new Error(errData.message || 'AI Vision API failed to analyze the image.');
       }
-    } catch (err) {
-      console.warn("AI food vision endpoint fallback", err);
+    } catch (err: any) {
+      console.warn("AI food vision error:", err);
       clearInterval(progressInterval);
       setScanProgress(100);
-
-      const nameGuess = fileName ? fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ") : "Custom Meal Plate";
-      setMealResult({
-        name: `Analyzed Meal (${nameGuess})`,
-        kcal: 480,
-        items: ["Protein portion", "Identified healthy greens", "Whole food ingredients"],
-        protein: 22,
-        carbs: 45,
-        fat: 16,
-        summary: "Nutritious balanced meal detected from photo upload."
-      });
-      setScanStatus('complete');
+      setMealError(err?.message || 'Failed to analyze food photo with AI Vision. Please try again.');
+      setScanStatus('error');
     }
   };
 
   // HANDLE UPLOADED OR SNAP-SHOT LOCAL IMAGES
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUrl = reader.result as string;
+      try {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (readEvent) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              let { width, height } = img;
+              const maxDim = 1200;
+              if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                  height = Math.round((height * maxDim) / width);
+                  width = maxDim;
+                } else {
+                  width = Math.round((width * maxDim) / height);
+                  height = maxDim;
+                }
+              }
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.85));
+              } else {
+                resolve(readEvent.target?.result as string);
+              }
+            };
+            img.onerror = () => resolve(readEvent.target?.result as string);
+            img.src = readEvent.target?.result as string;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
         setCapturedPhoto(dataUrl);
 
         if (cameraMode === 'pulse') {
@@ -392,10 +422,11 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
           }, 80);
         } else {
           // Trigger AI ingredient analysis on uploaded food photo
-          analyzeMealWithAI(dataUrl, file.name);
+          await analyzeMealWithAI(dataUrl, file.name);
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (uploadErr) {
+        console.error("Upload error:", uploadErr);
+      }
     }
     e.target.value = '';
   };
@@ -1141,6 +1172,22 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
                       </div>
                     )
                   )}
+                </div>
+              )}
+
+              {/* Error Notice Display */}
+              {mealError && (
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-[9px] text-rose-700 font-medium flex items-center justify-between gap-2 animate-fadeIn select-text">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                    <span className="truncate">{mealError}</span>
+                  </div>
+                  <button 
+                    onClick={() => setMealError(null)}
+                    className="text-[8px] font-bold text-rose-600 hover:text-rose-900 uppercase shrink-0 px-2 py-0.5 rounded bg-rose-100/50 cursor-pointer"
+                  >
+                    Dismiss
+                  </button>
                 </div>
               )}
             </div>
