@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MetricLog } from '../types';
+import { optimizeImageForUpload } from '../utils';
 import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { 
   Camera, 
@@ -333,15 +334,20 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
       setScanProgress(100);
 
       const responseText = await response.text();
-      let data: any = {};
+      let data: any = null;
       try {
         data = JSON.parse(responseText);
       } catch {
-        console.warn("Non-JSON response from server:", responseText);
-        throw new Error("Server returned an invalid response. Please try again with a clear photo.");
+        if (response.status === 413) {
+          throw new Error("Image file is too large for upload. Please try a different photo.");
+        } else if (response.status === 502 || response.status === 504) {
+          throw new Error("Analysis connection timed out. Please try again.");
+        } else {
+          throw new Error(`AI Vision service temporarily unavailable (HTTP ${response.status}).`);
+        }
       }
 
-      if (response.ok) {
+      if (response.ok && data) {
         setMealResult({
           name: data.dishName || 'AI Analyzed Meal Plate',
           kcal: Number(data.calories) || 400,
@@ -355,10 +361,10 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
         setScanStatus('complete');
         return;
       } else {
-        if (data.error === 'API_KEY_MISSING') {
+        if (data?.error === 'API_KEY_MISSING') {
           throw new Error('GEMINI_API_KEY is not configured in Settings > Secrets.');
         }
-        throw new Error(data.message || 'AI Vision API failed to analyze the image.');
+        throw new Error(data?.message || 'AI Vision API failed to analyze the image.');
       }
     } catch (err: any) {
       console.warn("AI food vision error:", err);
@@ -374,46 +380,7 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const dataUrl = await new Promise<string>((resolve, reject) => {
-          const url = URL.createObjectURL(file);
-          const img = new Image();
-          img.onload = () => {
-            URL.revokeObjectURL(url);
-            const canvas = document.createElement('canvas');
-            let { width, height } = img;
-            const maxDim = 960;
-            if (width > maxDim || height > maxDim) {
-              if (width > height) {
-                height = Math.round((height * maxDim) / width);
-                width = maxDim;
-              } else {
-                width = Math.round((width * maxDim) / height);
-                height = maxDim;
-              }
-            }
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              ctx.drawImage(img, 0, 0, width, height);
-              resolve(canvas.toDataURL('image/jpeg', 0.8));
-            } else {
-              const fallbackReader = new FileReader();
-              fallbackReader.onload = () => resolve(fallbackReader.result as string);
-              fallbackReader.onerror = reject;
-              fallbackReader.readAsDataURL(file);
-            }
-          };
-          img.onerror = () => {
-            URL.revokeObjectURL(url);
-            const fallbackReader = new FileReader();
-            fallbackReader.onload = () => resolve(fallbackReader.result as string);
-            fallbackReader.onerror = reject;
-            fallbackReader.readAsDataURL(file);
-          };
-          img.src = url;
-        });
-
+        const dataUrl = await optimizeImageForUpload(file);
         setCapturedPhoto(dataUrl);
 
         if (cameraMode === 'pulse') {
