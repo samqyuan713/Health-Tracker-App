@@ -332,8 +332,16 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
       clearInterval(progressInterval);
       setScanProgress(100);
 
+      const responseText = await response.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        console.warn("Non-JSON response from server:", responseText);
+        throw new Error("Server returned an invalid response. Please try again with a clear photo.");
+      }
+
       if (response.ok) {
-        const data = await response.json();
         setMealResult({
           name: data.dishName || 'AI Analyzed Meal Plate',
           kcal: Number(data.calories) || 400,
@@ -347,11 +355,10 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
         setScanStatus('complete');
         return;
       } else {
-        const errData = await response.json().catch(() => ({}));
-        if (errData.error === 'API_KEY_MISSING') {
+        if (data.error === 'API_KEY_MISSING') {
           throw new Error('GEMINI_API_KEY is not configured in Settings > Secrets.');
         }
-        throw new Error(errData.message || 'AI Vision API failed to analyze the image.');
+        throw new Error(data.message || 'AI Vision API failed to analyze the image.');
       }
     } catch (err: any) {
       console.warn("AI food vision error:", err);
@@ -368,37 +375,43 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
     if (file) {
       try {
         const dataUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (readEvent) => {
-            const img = new Image();
-            img.onload = () => {
-              const canvas = document.createElement('canvas');
-              let { width, height } = img;
-              const maxDim = 1200;
-              if (width > maxDim || height > maxDim) {
-                if (width > height) {
-                  height = Math.round((height * maxDim) / width);
-                  width = maxDim;
-                } else {
-                  width = Math.round((width * maxDim) / height);
-                  height = maxDim;
-                }
-              }
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
-              if (ctx) {
-                ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.85));
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          img.onload = () => {
+            URL.revokeObjectURL(url);
+            const canvas = document.createElement('canvas');
+            let { width, height } = img;
+            const maxDim = 960;
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
               } else {
-                resolve(readEvent.target?.result as string);
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
               }
-            };
-            img.onerror = () => resolve(readEvent.target?.result as string);
-            img.src = readEvent.target?.result as string;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', 0.8));
+            } else {
+              const fallbackReader = new FileReader();
+              fallbackReader.onload = () => resolve(fallbackReader.result as string);
+              fallbackReader.onerror = reject;
+              fallbackReader.readAsDataURL(file);
+            }
           };
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
+          img.onerror = () => {
+            URL.revokeObjectURL(url);
+            const fallbackReader = new FileReader();
+            fallbackReader.onload = () => resolve(fallbackReader.result as string);
+            fallbackReader.onerror = reject;
+            fallbackReader.readAsDataURL(file);
+          };
+          img.src = url;
         });
 
         setCapturedPhoto(dataUrl);
