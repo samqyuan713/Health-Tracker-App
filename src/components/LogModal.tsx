@@ -24,6 +24,7 @@ export default function LogModal({ type, onClose, onSave, currentLang = 'en' }: 
   const [aiIngredients, setAiIngredients] = useState<string[]>([]);
   const [aiDishName, setAiDishName] = useState<string>('');
   const [aiMacros, setAiMacros] = useState<{ protein: number; carbs: number; fat: number } | null>(null);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -52,6 +53,10 @@ export default function LogModal({ type, onClose, onSave, currentLang = 'en' }: 
     setPhoto(null);
     setAnalyzing(false);
     setAnalysisProgress(0);
+    setAnalysisError(null);
+    setAiIngredients([]);
+    setAiDishName('');
+    setAiMacros(null);
   }, [activeType]);
 
   if (!type) return null;
@@ -314,6 +319,7 @@ export default function LogModal({ type, onClose, onSave, currentLang = 'en' }: 
                           setAiIngredients([]);
                           setAiDishName('');
                           setAiMacros(null);
+                          setAnalysisError(null);
                         }}
                         className="bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-xl active:scale-95 transition-all cursor-pointer"
                       >
@@ -357,55 +363,114 @@ export default function LogModal({ type, onClose, onSave, currentLang = 'en' }: 
                     if (file) {
                       setAnalyzing(true);
                       setAnalysisProgress(20);
+                      setAnalysisError(null);
                       
-                      const reader = new FileReader();
-                      reader.onloadend = async () => {
-                        const dataUrl = reader.result as string;
+                      try {
+                        // Compress/resize image on client canvas for fast upload
+                        const dataUrl = await new Promise<string>((resolve, reject) => {
+                          const url = URL.createObjectURL(file);
+                          const img = new Image();
+                          img.onload = () => {
+                            URL.revokeObjectURL(url);
+                            const canvas = document.createElement('canvas');
+                            let { width, height } = img;
+                            const maxDim = 960;
+                            if (width > maxDim || height > maxDim) {
+                              if (width > height) {
+                                height = Math.round((height * maxDim) / width);
+                                width = maxDim;
+                              } else {
+                                width = Math.round((width * maxDim) / height);
+                                height = maxDim;
+                              }
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            if (ctx) {
+                              ctx.drawImage(img, 0, 0, width, height);
+                              resolve(canvas.toDataURL('image/jpeg', 0.8));
+                            } else {
+                              const fallbackReader = new FileReader();
+                              fallbackReader.onload = () => resolve(fallbackReader.result as string);
+                              fallbackReader.onerror = reject;
+                              fallbackReader.readAsDataURL(file);
+                            }
+                          };
+                          img.onerror = () => {
+                            URL.revokeObjectURL(url);
+                            const fallbackReader = new FileReader();
+                            fallbackReader.onload = () => resolve(fallbackReader.result as string);
+                            fallbackReader.onerror = reject;
+                            fallbackReader.readAsDataURL(file);
+                          };
+                          img.src = url;
+                        });
+
                         setPhoto(dataUrl);
                         setAnalysisProgress(50);
 
-                        try {
-                          // Call Gemini Vision endpoint
-                          const response = await fetch('/api/gemini/food-vision', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ imageBase64: dataUrl })
-                          });
-                          
-                          setAnalysisProgress(85);
+                        // Call Gemini Vision endpoint
+                        const response = await fetch('/api/gemini/food-vision', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ imageBase64: dataUrl })
+                        });
+                        
+                        setAnalysisProgress(85);
 
-                          if (response.ok) {
-                            const data = await response.json();
-                            setAnalysisProgress(100);
-                            setAiDishName(data.dishName || 'Healthy Plate');
-                            setAiIngredients(data.ingredients || []);
-                            if (data.protein !== undefined) {
-                              setAiMacros({ protein: data.protein, carbs: data.carbs, fat: data.fat });
-                            }
-                            if (data.calories) {
-                              setValue(data.calories);
-                            }
-                            const ingStr = data.ingredients?.length ? `Ingredients: ${data.ingredients.join(', ')}` : '';
-                            setNotes(`${data.dishName || 'Meal'} (${data.calories || 450} kcal). ${ingStr}`);
-                          } else {
-                            throw new Error('AI Vision endpoint error');
-                          }
-                        } catch (err) {
-                          console.warn("AI Food vision fallback", err);
-                          setAnalysisProgress(100);
-                          setAiDishName("Captured Plate");
-                          setAiIngredients(["Fresh Protein", "Mixed Greens", "Whole Grains"]);
-                          setValue(480);
-                          setNotes("Captured plate (AI Vision logged)");
-                        } finally {
-                          setAnalyzing(false);
+                        const responseText = await response.text();
+                        let data: any = {};
+                        try {
+                          data = JSON.parse(responseText);
+                        } catch {
+                          console.warn("Non-JSON response from server:", responseText);
+                          throw new Error("Server returned an invalid response. Please try again with a clear photo.");
                         }
-                      };
-                      reader.readAsDataURL(file);
+
+                        if (response.ok) {
+                          setAnalysisProgress(100);
+                          setAiDishName(data.dishName || 'Healthy Plate');
+                          setAiIngredients(data.ingredients || []);
+                          if (data.protein !== undefined) {
+                            setAiMacros({ protein: data.protein, carbs: data.carbs, fat: data.fat });
+                          }
+                          if (data.calories) {
+                            setValue(data.calories);
+                          }
+                          const ingStr = data.ingredients?.length ? `Ingredients: ${data.ingredients.join(', ')}` : '';
+                          setNotes(`${data.dishName || 'Meal'} (${data.calories || 450} kcal). ${ingStr}`);
+                        } else {
+                          if (data.error === 'API_KEY_MISSING') {
+                            setAnalysisError('Please configure your GEMINI_API_KEY in the Settings > Secrets panel to enable AI food checking.');
+                          } else {
+                            setAnalysisError(data.message || 'AI Vision analysis failed for this photo.');
+                          }
+                        }
+                      } catch (err: any) {
+                        console.error("AI Food vision error:", err);
+                        setAnalysisError(err?.message || 'Unable to analyze image. Please check your connection and try again.');
+                      } finally {
+                        setAnalyzing(false);
+                      }
                     }
                   }}
                 />
               </div>
+
+              {/* Error Notice if Vision API encountered issue */}
+              {analysisError && (
+                <div className="bg-rose-50 border border-rose-200 rounded-xl p-2.5 text-[9px] text-rose-700 font-medium animate-fadeIn flex items-center justify-between gap-2">
+                  <span>⚠️ {analysisError}</span>
+                  <button 
+                    type="button" 
+                    onClick={() => setAnalysisError(null)}
+                    className="text-rose-500 hover:text-rose-800 font-bold uppercase text-[8px] shrink-0"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
 
               {/* AI Identified Ingredients Badge Card */}
               {aiIngredients.length > 0 && (
