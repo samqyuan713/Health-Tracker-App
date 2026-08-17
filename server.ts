@@ -292,10 +292,11 @@ User question: ${message}
 
   // AI Food Vision & Ingredient Analysis Endpoint
   app.post("/api/gemini/food-vision", async (req, res) => {
+    res.setHeader("Content-Type", "application/json");
     try {
       const { imageBase64 } = req.body;
 
-      if (!imageBase64) {
+      if (!imageBase64 || typeof imageBase64 !== "string") {
         res.status(400).json({ error: "Image data is required" });
         return;
       }
@@ -343,6 +344,17 @@ User question: ${message}
             mimeType = match[1].toLowerCase();
           }
         }
+      }
+
+      // Strip any whitespace, line breaks or carriage returns from base64 string
+      cleanData = cleanData.replace(/[\r\n\s]/g, "");
+
+      if (!cleanData || cleanData.length < 50) {
+        res.status(400).json({
+          error: "INVALID_IMAGE",
+          message: "The provided image data was empty or corrupted. Please take a clear photo and try again."
+        });
+        return;
       }
 
       // Gemini Vision supports image/jpeg, image/png, image/webp, image/gif, image/heic
