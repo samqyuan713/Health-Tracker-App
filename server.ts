@@ -300,7 +300,9 @@ User question: ${message}
         return;
       }
 
-      const apiKey = process.env.GEMINI_API_KEY;
+      const rawApiKey = process.env.GEMINI_API_KEY;
+      const apiKey = rawApiKey ? rawApiKey.trim().replace(/^["']|["']$/g, '') : undefined;
+
       if (!apiKey) {
         console.warn("GEMINI_API_KEY missing for food vision.");
         res.status(400).json({
@@ -340,10 +342,10 @@ User question: ${message}
         "6. fat: Estimated fat in grams (integer)\n" +
         "7. summary: A concise 1-sentence nutritional insight highlighting key macronutrients or micronutrient benefits.";
 
-      console.log(`Calling Gemini Vision (gemini-3.7-flash) with ${mimeType} image for nutrition analysis...`);
+      console.log(`Calling Gemini Vision (gemini-2.5-flash) with ${mimeType} image for nutrition analysis...`);
       const response = await withRetry(() => 
         ai.models.generateContent({
-          model: "gemini-3.7-flash",
+          model: "gemini-2.5-flash",
           contents: [
             {
               role: "user",
@@ -393,9 +395,18 @@ User question: ${message}
 
     } catch (error: any) {
       console.error("Food vision endpoint error:", error);
+      const errMsg = error?.message || "";
+      let userFriendlyMsg = "Failed to analyze food photo with AI Vision. Please try again.";
+
+      if (errMsg.includes("API key not valid") || errMsg.includes("API_KEY_INVALID") || errMsg.includes("Wrong token") || errMsg.includes("401") || errMsg.includes("UNAUTHENTICATED")) {
+        userFriendlyMsg = "Invalid API Key. Please verify that your GEMINI_API_KEY in Settings > Secrets starts with 'AIzaSy...' without extra spaces or quotes.";
+      } else if (errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("429")) {
+        userFriendlyMsg = "Rate limit reached for Gemini API. Please wait a moment and try again.";
+      }
+
       res.status(500).json({
         error: "FOOD_VISION_FAILED",
-        message: error?.message || "Failed to analyze food photo with AI Vision. Please try again."
+        message: userFriendlyMsg
       });
     }
   });
