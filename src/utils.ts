@@ -102,6 +102,83 @@ export function getBiometricAlerts(stats: ReturnType<typeof getStatsForDay>, goa
   return alerts;
 }
 
+// Client-side image optimizer for fast & reliable AI Vision uploads across all mobile & desktop browsers
+export async function optimizeImageForUpload(file: File): Promise<string> {
+  const maxDim = 800;
+  const quality = 0.75;
+
+  // Try ImageBitmap first (standard for modern browsers including mobile Safari & Chrome, handles EXIF orientation)
+  if (typeof window !== 'undefined' && 'createImageBitmap' in window) {
+    try {
+      const bitmap = await createImageBitmap(file);
+      let width = bitmap.width;
+      let height = bitmap.height;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, width);
+      canvas.height = Math.max(1, height);
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        bitmap.close();
+        return canvas.toDataURL('image/jpeg', quality);
+      }
+    } catch (e) {
+      console.warn("createImageBitmap failed, falling back to standard canvas renderer:", e);
+    }
+  }
+
+  // Fallback to FileReader + HTMLImageElement + Canvas
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (readEvent) => {
+      const src = readEvent.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        let width = img.naturalWidth || img.width || 800;
+        let height = img.naturalHeight || img.height || 600;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, width);
+        canvas.height = Math.max(1, height);
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } else {
+          resolve(src);
+        }
+      };
+      img.onerror = () => {
+        resolve(src);
+      };
+      img.src = src;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 // CSV Health Data Exporter
 export function exportHealthDataCSV(logs: MetricLog[]) {
   const headers = ['ID', 'Timestamp', 'Date', 'Type', 'Value', 'Notes'];
