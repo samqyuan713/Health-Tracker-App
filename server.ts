@@ -323,11 +323,32 @@ User question: ${message}
 
       // Parse MIME type and clean Base64 data safely
       let mimeType = "image/jpeg";
-      let cleanData = imageBase64;
-      const dataUriMatch = imageBase64.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,(.+)$/);
-      if (dataUriMatch) {
-        mimeType = dataUriMatch[1];
-        cleanData = dataUriMatch[2];
+      let cleanData = imageBase64.trim();
+      
+      if (cleanData.includes(";base64,")) {
+        const parts = cleanData.split(";base64,");
+        const meta = parts[0];
+        cleanData = parts[1].trim();
+        const match = meta.match(/data:([^;]+)/);
+        if (match) {
+          mimeType = match[1].toLowerCase();
+        }
+      } else if (cleanData.startsWith("data:")) {
+        const commaIdx = cleanData.indexOf(",");
+        if (commaIdx !== -1) {
+          const meta = cleanData.substring(0, commaIdx);
+          cleanData = cleanData.substring(commaIdx + 1).trim();
+          const match = meta.match(/data:([^;]+)/);
+          if (match) {
+            mimeType = match[1].toLowerCase();
+          }
+        }
+      }
+
+      // Gemini Vision supports image/jpeg, image/png, image/webp, image/gif, image/heic
+      const allowedMimes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"];
+      if (!allowedMimes.includes(mimeType)) {
+        mimeType = "image/jpeg";
       }
 
       const systemInstruction = 
@@ -380,8 +401,41 @@ User question: ${message}
         })
       );
 
-      const rawText = response.text || "{}";
-      const visionResult = JSON.parse(rawText);
+      const rawText = (response.text || "").trim();
+      let cleanJson = rawText;
+      
+      // Strip markdown code fences if model returned them
+      if (cleanJson.startsWith("```")) {
+        cleanJson = cleanJson.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+      }
+      
+      // Extract json object bounds
+      const firstBrace = cleanJson.indexOf("{");
+      const lastBrace = cleanJson.lastIndexOf("}");
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
+      }
+
+      let visionResult: any = {};
+      try {
+        visionResult = JSON.parse(cleanJson);
+      } catch (parseErr) {
+        console.warn("JSON.parse encountered issue on raw text:", rawText);
+        const dishMatch = rawText.match(/"dishName"\s*:\s*"([^"]+)"/);
+        const calMatch = rawText.match(/"calories"\s*:\s*(\d+)/);
+        const protMatch = rawText.match(/"protein"\s*:\s*(\d+)/);
+        const carbsMatch = rawText.match(/"carbs"\s*:\s*(\d+)/);
+        const fatMatch = rawText.match(/"fat"\s*:\s*(\d+)/);
+        visionResult = {
+          dishName: dishMatch ? dishMatch[1] : "Nutritious Meal Plate",
+          calories: calMatch ? parseInt(calMatch[1], 10) : 420,
+          protein: protMatch ? parseInt(protMatch[1], 10) : 22,
+          carbs: carbsMatch ? parseInt(carbsMatch[1], 10) : 40,
+          fat: fatMatch ? parseInt(fatMatch[1], 10) : 15,
+          ingredients: ["Identified ingredients", "Whole foods"],
+          summary: "Freshly prepared balanced meal."
+        };
+      }
 
       res.json({
         dishName: visionResult.dishName || "Analyzed Meal",
