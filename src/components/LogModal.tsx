@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MetricLog } from '../types';
-import { MOOD_DETAILS } from '../utils';
+import { MOOD_DETAILS, optimizeImageForUpload } from '../utils';
 import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { X, Activity, Droplet, Flame, Moon, Scale, Smile, Check, Utensils, Camera, RefreshCw, Sparkles } from 'lucide-react';
 
@@ -366,46 +366,8 @@ export default function LogModal({ type, onClose, onSave, currentLang = 'en' }: 
                       setAnalysisError(null);
                       
                       try {
-                        // Compress/resize image on client canvas for fast upload
-                        const dataUrl = await new Promise<string>((resolve, reject) => {
-                          const url = URL.createObjectURL(file);
-                          const img = new Image();
-                          img.onload = () => {
-                            URL.revokeObjectURL(url);
-                            const canvas = document.createElement('canvas');
-                            let { width, height } = img;
-                            const maxDim = 960;
-                            if (width > maxDim || height > maxDim) {
-                              if (width > height) {
-                                height = Math.round((height * maxDim) / width);
-                                width = maxDim;
-                              } else {
-                                width = Math.round((width * maxDim) / height);
-                                height = maxDim;
-                              }
-                            }
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            if (ctx) {
-                              ctx.drawImage(img, 0, 0, width, height);
-                              resolve(canvas.toDataURL('image/jpeg', 0.8));
-                            } else {
-                              const fallbackReader = new FileReader();
-                              fallbackReader.onload = () => resolve(fallbackReader.result as string);
-                              fallbackReader.onerror = reject;
-                              fallbackReader.readAsDataURL(file);
-                            }
-                          };
-                          img.onerror = () => {
-                            URL.revokeObjectURL(url);
-                            const fallbackReader = new FileReader();
-                            fallbackReader.onload = () => resolve(fallbackReader.result as string);
-                            fallbackReader.onerror = reject;
-                            fallbackReader.readAsDataURL(file);
-                          };
-                          img.src = url;
-                        });
+                        // Compress/resize image on client canvas for fast, lightweight upload (~50-100KB)
+                        const dataUrl = await optimizeImageForUpload(file);
 
                         setPhoto(dataUrl);
                         setAnalysisProgress(50);
@@ -420,15 +382,20 @@ export default function LogModal({ type, onClose, onSave, currentLang = 'en' }: 
                         setAnalysisProgress(85);
 
                         const responseText = await response.text();
-                        let data: any = {};
+                        let data: any = null;
                         try {
                           data = JSON.parse(responseText);
                         } catch {
-                          console.warn("Non-JSON response from server:", responseText);
-                          throw new Error("Server returned an invalid response. Please try again with a clear photo.");
+                          if (response.status === 413) {
+                            throw new Error("Image file is too large for upload. Please try a different photo.");
+                          } else if (response.status === 502 || response.status === 504) {
+                            throw new Error("Analysis connection timed out. Please try again.");
+                          } else {
+                            throw new Error(`AI Vision service temporarily unavailable (HTTP ${response.status}).`);
+                          }
                         }
 
-                        if (response.ok) {
+                        if (response.ok && data) {
                           setAnalysisProgress(100);
                           setAiDishName(data.dishName || 'Healthy Plate');
                           setAiIngredients(data.ingredients || []);
@@ -441,10 +408,10 @@ export default function LogModal({ type, onClose, onSave, currentLang = 'en' }: 
                           const ingStr = data.ingredients?.length ? `Ingredients: ${data.ingredients.join(', ')}` : '';
                           setNotes(`${data.dishName || 'Meal'} (${data.calories || 450} kcal). ${ingStr}`);
                         } else {
-                          if (data.error === 'API_KEY_MISSING') {
+                          if (data?.error === 'API_KEY_MISSING') {
                             setAnalysisError('Please configure your GEMINI_API_KEY in the Settings > Secrets panel to enable AI food checking.');
                           } else {
-                            setAnalysisError(data.message || 'AI Vision analysis failed for this photo.');
+                            setAnalysisError(data?.message || 'AI Vision analysis failed for this photo.');
                           }
                         }
                       } catch (err: any) {
