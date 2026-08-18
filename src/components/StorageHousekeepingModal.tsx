@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { HardDrive, Trash2, Image, MessageSquare, Database, RefreshCw, Check, AlertTriangle, ShieldCheck, X } from 'lucide-react';
-import { MetricLog, ChatMessage } from '../types';
+import React, { useState, useEffect, useRef } from 'react';
+import { HardDrive, Trash2, Image, MessageSquare, Database, RefreshCw, Check, AlertTriangle, ShieldCheck, X, Download, Upload, FileJson } from 'lucide-react';
+import { MetricLog, ChatMessage, DailyGoals } from '../types';
+import { exportHealthBackupJSON, DEFAULT_GOALS } from '../utils';
 
 interface StorageHousekeepingModalProps {
   isOpen: boolean;
   onClose: () => void;
   userId: string;
   logs: MetricLog[];
+  goals?: DailyGoals;
   chatHistory: ChatMessage[];
   onUpdateLogs: (logs: MetricLog[]) => void;
+  onUpdateGoals?: (goals: DailyGoals) => void;
   onUpdateChat: (chat: ChatMessage[]) => void;
 }
 
@@ -17,8 +20,10 @@ export default function StorageHousekeepingModal({
   onClose,
   userId,
   logs,
+  goals = DEFAULT_GOALS,
   chatHistory,
   onUpdateLogs,
+  onUpdateGoals,
   onUpdateChat
 }: StorageHousekeepingModalProps) {
   const [logsStorageKB, setLogsStorageKB] = useState<number>(0);
@@ -27,6 +32,8 @@ export default function StorageHousekeepingModal({
   const [chatStorageKB, setChatStorageKB] = useState<number>(0);
   const [totalStorageKB, setTotalStorageKB] = useState<number>(0);
   const [actionSuccessMessage, setActionSuccessMessage] = useState<string | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Maximum standard browser localStorage quota (~5000 KB = 5 MB)
   const MAX_STORAGE_KB = 5120;
@@ -34,6 +41,7 @@ export default function StorageHousekeepingModal({
   useEffect(() => {
     if (isOpen) {
       calculateStorageStats();
+      setImportError(null);
     }
   }, [isOpen, logs, chatHistory]);
 
@@ -124,6 +132,62 @@ export default function StorageHousekeepingModal({
     }, 2000);
   };
 
+  // Action: Export Full Backup JSON
+  const handleExportBackup = () => {
+    exportHealthBackupJSON(userId, logs, goals);
+    setActionSuccessMessage(`Exported ${logs.length} records to backup JSON.`);
+    setTimeout(() => setActionSuccessMessage(null), 2500);
+  };
+
+  // Action: Restore Backup from JSON File
+  const handleImportBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImportError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const parsed = JSON.parse(content);
+
+        // Validate payload structure
+        let importedLogs: MetricLog[] = [];
+        if (Array.isArray(parsed)) {
+          importedLogs = parsed;
+        } else if (parsed && Array.isArray(parsed.logs)) {
+          importedLogs = parsed.logs;
+          if (parsed.goals && onUpdateGoals) {
+            onUpdateGoals(parsed.goals);
+          }
+        } else {
+          throw new Error("Invalid backup format. File must contain health logs.");
+        }
+
+        // Merge with current logs (deduplicate by id or timestamp+type)
+        const existingIds = new Set(logs.map(l => l.id));
+        const newRecords = importedLogs.filter(l => l && l.id && !existingIds.has(l.id));
+        const merged = [...logs, ...newRecords];
+
+        onUpdateLogs(merged);
+        setActionSuccessMessage(`Successfully restored ${newRecords.length} new records! Total history: ${merged.length} logs.`);
+        setTimeout(() => {
+          calculateStorageStats();
+          setActionSuccessMessage(null);
+        }, 3000);
+      } catch (err: any) {
+        setImportError(err.message || "Failed to parse JSON backup file.");
+      }
+    };
+    reader.onerror = () => setImportError("Failed to read the selected backup file.");
+    reader.readAsText(file);
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   // Action 4: Deep Reset / Factory Clean
   const handleFactoryReset = () => {
     if (confirm("Are you sure you want to clear all local Vitalstream cache and start fresh? This cannot be undone.")) {
@@ -207,6 +271,58 @@ export default function StorageHousekeepingModal({
             <span>{actionSuccessMessage}</span>
           </div>
         )}
+
+        {/* Import Error Alert */}
+        {importError && (
+          <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold p-3 rounded-2xl flex items-center gap-2 animate-fadeIn">
+            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            <span>{importError}</span>
+          </div>
+        )}
+
+        {/* Backup & Restore Tools Section */}
+        <div className="space-y-2.5">
+          <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">
+            Data Preservation & APK Upgrade Backup
+          </span>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            {/* Export JSON Backup */}
+            <button
+              onClick={handleExportBackup}
+              className="p-3 bg-emerald-50/80 hover:bg-emerald-100 border border-emerald-200 rounded-2xl flex flex-col items-start gap-1 text-left transition-all active:scale-98 cursor-pointer"
+            >
+              <div className="flex items-center gap-1.5 text-emerald-700 font-extrabold text-xs">
+                <Download className="w-4 h-4" />
+                <span>Save Backup JSON</span>
+              </div>
+              <span className="text-[9px] text-emerald-900/70 font-semibold leading-tight">
+                Download {logs.length} records to keep before re-installing APK
+              </span>
+            </button>
+
+            {/* Restore JSON Backup */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="p-3 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200 rounded-2xl flex flex-col items-start gap-1 text-left transition-all active:scale-98 cursor-pointer"
+            >
+              <div className="flex items-center gap-1.5 text-indigo-700 font-extrabold text-xs">
+                <Upload className="w-4 h-4" />
+                <span>Restore Backup</span>
+              </div>
+              <span className="text-[9px] text-indigo-900/70 font-semibold leading-tight">
+                Import previously saved .json backup file
+              </span>
+            </button>
+            <input 
+              ref={fileInputRef}
+              type="file"
+              accept=".json,application/json"
+              className="hidden"
+              onChange={handleImportBackup}
+            />
+          </div>
+        </div>
 
         {/* Housekeeping Action Tools */}
         <div className="space-y-2.5">
