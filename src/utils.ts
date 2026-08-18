@@ -179,6 +179,29 @@ export async function optimizeImageForUpload(file: File): Promise<string> {
   });
 }
 
+// JSON Full Health Backup Exporter (All logs, goals, user history)
+export function exportHealthBackupJSON(userId: string, logs: MetricLog[], goals: DailyGoals) {
+  const backupPayload = {
+    version: '1.0.0',
+    app: 'VitalStream',
+    exportedAt: new Date().toISOString(),
+    userId,
+    goals,
+    logs
+  };
+
+  const jsonStr = JSON.stringify(backupPayload, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `VitalStream_Backup_${userId}_${new Date().toISOString().split('T')[0]}.json`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 // CSV Health Data Exporter
 export function exportHealthDataCSV(logs: MetricLog[]) {
   const headers = ['ID', 'Timestamp', 'Date', 'Type', 'Value', 'Notes'];
