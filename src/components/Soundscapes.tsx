@@ -18,7 +18,6 @@ import {
 import { MetricLog } from '../types';
 import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { getFullApiUrl } from '../utils';
-import { getFullApiUrl } from '../utils';
 
 interface SoundscapesProps {
   onAddLog: (type: MetricLog['type'], value: number, notes?: string) => void;
