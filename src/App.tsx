@@ -11,7 +11,7 @@ import StorageHousekeepingModal from './components/StorageHousekeepingModal';
 import ProUpgradeModal from './components/ProUpgradeModal';
 
 import { MetricLog, DailyGoals, ChatMessage, UserProfile } from './types';
-import { SEED_LOGS, DEFAULT_GOALS, getRelativeDateString, getStatsForDay } from './utils';
+import { SEED_LOGS, DEFAULT_GOALS, getRelativeDateString, getStatsForDay, getFullApiUrl } from './utils';
 import { TRANSLATIONS, SupportedLanguage } from './utils/i18n';
 
 import { 
@@ -209,7 +209,7 @@ export default function App() {
     const summaryText = `The user's stats for date ${selectedDate} are: ${currentStats.steps} steps (Target ${goals.steps}), ${currentStats.water} ml of water (Target ${goals.water}), ${currentStats.calories} kcal burned (Target ${goals.calories}), sleep hours: ${currentStats.sleep} hrs (Target ${goals.sleep}, Pattern Details: "${sleepLog?.notes || 'none'}"). Food Intake: ${currentStats.food} kcal (Target ${goals.food || 2000} kcal, Food logged: [ ${foodListStr} ]). Current Mood/wellbeing: ${currentStats.mood || "unlogged"}/5. Weight recorded: ${currentStats.weight || "unlogged"}kg.`;
 
     try {
-      const response = await fetch('/api/gemini/coach', {
+      const response = await fetch(getFullApiUrl('/api/gemini/coach'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
