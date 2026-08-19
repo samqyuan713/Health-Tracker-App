@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { MetricLog } from '../types';
 import { getTranslation, SupportedLanguage } from '../utils/i18n';
+import { getFullApiUrl } from '../utils';
+import { getFullApiUrl } from '../utils';
 
 interface SoundscapesProps {
   onAddLog: (type: MetricLog['type'], value: number, notes?: string) => void;
@@ -236,7 +238,7 @@ export default function Soundscapes({ onAddLog, selectedDate, currentLang = 'en'
     stopAudioSynth();
 
     try {
-      const response = await fetch('/api/gemini/song', {
+      const response = await fetch(getFullApiUrl('/api/gemini/song'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
