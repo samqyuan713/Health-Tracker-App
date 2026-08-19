@@ -1,5 +1,45 @@
 import { MetricLog, DailyGoals } from './types';
 
+// Default Hosted Backend URL (used when running as standalone mobile APK)
+export const DEFAULT_HOSTED_BACKEND_URL = "https://ais-dev-k6z4f6wcf5vfsnc6wxywm7-469255650912.asia-southeast1.run.app";
+
+// Helper to determine the correct API base URL whether running on web, emulator, or standalone APK
+export function getApiBaseUrl(): string {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  // Check if user set a custom backend URL in app settings
+  const customUrl = localStorage.getItem('vitalstream_custom_backend_url');
+  if (customUrl && customUrl.trim()) {
+    return customUrl.trim().replace(/\/+$/, '');
+  }
+
+  // Check if running in a standalone mobile app wrapper (file://, capacitor://, localhost without port 3000)
+  const isCapacitor = (window as any).Capacitor !== undefined;
+  const isCordova = (window as any).cordova !== undefined;
+  const isFileOrigin = window.location.protocol === 'file:';
+  const isAppUrl = window.location.hostname === 'localhost' && window.location.port !== '3000';
+
+  if (isCapacitor || isCordova || isFileOrigin || isAppUrl) {
+    return DEFAULT_HOSTED_BACKEND_URL;
+  }
+
+  // If running directly on a different domain or webview where relative path might fail
+  if (window.location.origin.includes('localhost:3000') || window.location.origin.includes('run.app')) {
+    return ''; // Relative path works directly
+  }
+
+  // Default fallback to hosted backend for hybrid mobile deployments
+  return DEFAULT_HOSTED_BACKEND_URL;
+}
+
+export function getFullApiUrl(endpoint: string): string {
+  const base = getApiBaseUrl();
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  return base ? `${base}${cleanEndpoint}` : cleanEndpoint;
+}
+
 // Helper to generate dates relative to today
 export function getRelativeDateString(daysAgo: number): string {
   const d = new Date();
