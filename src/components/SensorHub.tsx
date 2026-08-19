@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MetricLog } from '../types';
-import { optimizeImageForUpload } from '../utils';
+import { optimizeImageForUpload, getFullApiUrl } from '../utils';
 import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { 
   Camera, 
@@ -324,7 +324,7 @@ export default function SensorHub({ onAddLog, selectedDate, currentLang = 'en' }
     }, 120);
 
     try {
-      const response = await fetch('/api/gemini/food-vision', {
+      const response = await fetch(getFullApiUrl('/api/gemini/food-vision'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64: dataUrl })
