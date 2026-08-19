@@ -672,10 +672,15 @@ export default function App() {
         onClose={() => setIsHousekeepingOpen(false)}
         userId={currentUser.id}
         logs={logs}
+        goals={goals}
         chatHistory={chatHistory}
         onUpdateLogs={(newLogs) => {
           setLogs(newLogs);
           saveLogsToStorage(newLogs);
+        }}
+        onUpdateGoals={(newGoals) => {
+          setGoals(newGoals);
+          localStorage.setItem(`health_tracker_goals_${currentUser.id}`, JSON.stringify(newGoals));
         }}
         onUpdateChat={(newChat) => {
           setChatHistory(newChat);
