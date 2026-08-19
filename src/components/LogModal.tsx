@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MetricLog } from '../types';
-import { MOOD_DETAILS, optimizeImageForUpload } from '../utils';
+import { MOOD_DETAILS, optimizeImageForUpload, getFullApiUrl } from '../utils';
 import { getTranslation, SupportedLanguage } from '../utils/i18n';
 import { X, Activity, Droplet, Flame, Moon, Scale, Smile, Check, Utensils, Camera, RefreshCw, Sparkles } from 'lucide-react';
 
@@ -373,7 +373,7 @@ export default function LogModal({ type, onClose, onSave, currentLang = 'en' }: 
                         setAnalysisProgress(50);
 
                         // Call Gemini Vision endpoint
-                        const response = await fetch('/api/gemini/food-vision', {
+                        const response = await fetch(getFullApiUrl('/api/gemini/food-vision'), {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ imageBase64: dataUrl })
