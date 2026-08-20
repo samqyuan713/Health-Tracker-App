@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { HardDrive, Trash2, Image, MessageSquare, Database, RefreshCw, Check, AlertTriangle, ShieldCheck, X, Download, Upload, FileJson } from 'lucide-react';
+import { HardDrive, Trash2, Image, MessageSquare, Database, RefreshCw, Check, AlertTriangle, ShieldCheck, X, Download, Upload, FileJson, Globe, Wifi, Server } from 'lucide-react';
 import { MetricLog, ChatMessage, DailyGoals } from '../types';
-import { exportHealthBackupJSON, DEFAULT_GOALS } from '../utils';
+import { exportHealthBackupJSON, DEFAULT_GOALS, DEFAULT_HOSTED_BACKEND_URL, getApiBaseUrl, getFullApiUrl } from '../utils';
 
 interface StorageHousekeepingModalProps {
   isOpen: boolean;
@@ -33,6 +33,9 @@ export default function StorageHousekeepingModal({
   const [totalStorageKB, setTotalStorageKB] = useState<number>(0);
   const [actionSuccessMessage, setActionSuccessMessage] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
+  const [backendUrl, setBackendUrl] = useState<string>('');
+  const [testingConnection, setTestingConnection] = useState<boolean>(false);
+  const [connectionStatus, setConnectionStatus] = useState<{ ok?: boolean; message?: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Maximum standard browser localStorage quota (~5000 KB = 5 MB)
@@ -42,6 +45,9 @@ export default function StorageHousekeepingModal({
     if (isOpen) {
       calculateStorageStats();
       setImportError(null);
+      const saved = localStorage.getItem('vitalstream_custom_backend_url') || DEFAULT_HOSTED_BACKEND_URL;
+      setBackendUrl(saved);
+      setConnectionStatus(null);
     }
   }, [isOpen, logs, chatHistory]);
 
@@ -188,6 +194,39 @@ export default function StorageHousekeepingModal({
     }
   };
 
+  // Action: Save and test backend URL
+  const handleSaveBackendUrl = (url: string) => {
+    const clean = url.trim().replace(/\/+$/, '');
+    setBackendUrl(clean);
+    if (clean) {
+      localStorage.setItem('vitalstream_custom_backend_url', clean);
+    } else {
+      localStorage.removeItem('vitalstream_custom_backend_url');
+    }
+  };
+
+  const handleTestBackendConnection = async () => {
+    setTestingConnection(true);
+    setConnectionStatus(null);
+    try {
+      const targetUrl = getFullApiUrl('/api/health');
+      const res = await fetch(targetUrl, { method: 'GET' });
+      if (res.ok) {
+        const data = await res.json();
+        setConnectionStatus({ ok: true, message: `Connected! Server time: ${data.time || 'OK'}` });
+      } else {
+        setConnectionStatus({ ok: false, message: `Server responded with HTTP ${res.status}` });
+      }
+    } catch (err: any) {
+      setConnectionStatus({ 
+        ok: false, 
+        message: err?.message || 'Failed to connect. Check internet & URL.' 
+      });
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
   // Action 4: Deep Reset / Factory Clean
   const handleFactoryReset = () => {
     if (confirm("Are you sure you want to clear all local Vitalstream cache and start fresh? This cannot be undone.")) {
@@ -279,6 +318,62 @@ export default function StorageHousekeepingModal({
             <span>{importError}</span>
           </div>
         )}
+
+        {/* Cloud Sync & APK Connectivity Settings */}
+        <div className="space-y-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-extrabold text-slate-700 uppercase tracking-widest flex items-center gap-1.5">
+              <Server className="w-3.5 h-3.5 text-indigo-600" />
+              <span>AI Cloud & APK Service Endpoint</span>
+            </span>
+            <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
+              Mobile APK Routing
+            </span>
+          </div>
+
+          <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+            Routes AI Vision, Coach Leo, and Song Synthesis to your live cloud server when running inside the standalone Android APK.
+          </p>
+
+          <div className="space-y-2 pt-1">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={backendUrl}
+                onChange={(e) => handleSaveBackendUrl(e.target.value)}
+                placeholder={DEFAULT_HOSTED_BACKEND_URL}
+                className="flex-1 px-3 py-2 text-[11px] bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 font-mono text-slate-700"
+              />
+              <button
+                onClick={handleTestBackendConnection}
+                disabled={testingConnection}
+                className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-[10px] font-extrabold flex items-center gap-1 cursor-pointer transition-all active:scale-95 shrink-0"
+              >
+                {testingConnection ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Wifi className="w-3.5 h-3.5" />
+                )}
+                <span>Test Link</span>
+              </button>
+            </div>
+
+            {connectionStatus && (
+              <div className={`p-2 rounded-xl text-[10px] font-bold flex items-center gap-1.5 ${
+                connectionStatus.ok 
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                  : 'bg-rose-50 text-rose-700 border border-rose-200'
+              }`}>
+                {connectionStatus.ok ? (
+                  <Check className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+                ) : (
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-rose-600" />
+                )}
+                <span>{connectionStatus.message}</span>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Backup & Restore Tools Section */}
         <div className="space-y-2.5">
