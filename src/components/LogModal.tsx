@@ -416,7 +416,12 @@ export default function LogModal({ type, onClose, onSave, currentLang = 'en' }: 
                         }
                       } catch (err: any) {
                         console.error("AI Food vision error:", err);
-                        setAnalysisError(err?.message || 'Unable to analyze image. Please check your connection and try again.');
+                        const msg = err?.message || '';
+                        if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+                          setAnalysisError('Network connection to cloud server failed. Check your internet connection or verify the Cloud URL in the Storage Settings.');
+                        } else {
+                          setAnalysisError(err?.message || 'Unable to analyze image. Please check your connection and try again.');
+                        }
                       } finally {
                         setAnalyzing(false);
                       }
