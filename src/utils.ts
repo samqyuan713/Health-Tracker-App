@@ -1,7 +1,8 @@
 import { MetricLog, DailyGoals } from './types';
 
 // Default Hosted Backend URL (used when running as standalone mobile APK)
-export const DEFAULT_HOSTED_BACKEND_URL = "https://ais-dev-k6z4f6wcf5vfsnc6wxywm7-469255650912.asia-southeast1.run.app";
+// Public shared app URL allows mobile APKs to connect without development container authentication blocks
+export const DEFAULT_HOSTED_BACKEND_URL = "https://ais-pre-k6z4f6wcf5vfsnc6wxywm7-469255650912.asia-southeast1.run.app";
 
 // Helper to determine the correct API base URL whether running on web, emulator, or standalone APK
 export function getApiBaseUrl(): string {
@@ -9,9 +10,22 @@ export function getApiBaseUrl(): string {
     return '';
   }
 
-  // Check if user set a custom backend URL in app settings
+  // Check if running in standard browser/preview environment
+  const isWebBrowser = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+  const isPreviewHost = window.location.hostname.includes('run.app') || window.location.hostname === 'localhost';
+
+  // Check if user explicitly set a custom backend URL in app settings
   const customUrl = localStorage.getItem('vitalstream_custom_backend_url');
   if (customUrl && customUrl.trim()) {
+    // If we're inside web browser iframe and user typed the same domain as current window, use relative path
+    try {
+      const parsed = new URL(customUrl);
+      if (parsed.origin === window.location.origin) {
+        return '';
+      }
+    } catch {
+      // not a full url
+    }
     return customUrl.trim().replace(/\/+$/, '');
   }
 
@@ -25,12 +39,12 @@ export function getApiBaseUrl(): string {
     return DEFAULT_HOSTED_BACKEND_URL;
   }
 
-  // If running directly on a different domain or webview where relative path might fail
-  if (window.location.origin.includes('localhost:3000') || window.location.origin.includes('run.app')) {
-    return ''; // Relative path works directly
+  // When running directly on the web preview (dev or shared), always default to relative path to avoid CORS/Auth redirects
+  if (isWebBrowser && isPreviewHost) {
+    return '';
   }
 
-  // Default fallback to hosted backend for hybrid mobile deployments
+  // Fallback for hybrid mobile deployments
   return DEFAULT_HOSTED_BACKEND_URL;
 }
 
