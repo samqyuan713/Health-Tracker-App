@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { HardDrive, Trash2, Image, MessageSquare, Database, RefreshCw, Check, AlertTriangle, ShieldCheck, X, Download, Upload, FileJson, Globe, Wifi, Server } from 'lucide-react';
+import { HardDrive, Trash2, Image, MessageSquare, Database, RefreshCw, Check, AlertTriangle, ShieldCheck, X, Download, Upload, FileJson, Globe, Wifi, Server, Copy } from 'lucide-react';
 import { MetricLog, ChatMessage, DailyGoals } from '../types';
 import { exportHealthBackupJSON, DEFAULT_GOALS, DEFAULT_HOSTED_BACKEND_URL, getApiBaseUrl, getFullApiUrl } from '../utils';
 
@@ -36,6 +36,7 @@ export default function StorageHousekeepingModal({
   const [backendUrl, setBackendUrl] = useState<string>('');
   const [testingConnection, setTestingConnection] = useState<boolean>(false);
   const [connectionStatus, setConnectionStatus] = useState<{ ok?: boolean; message?: string } | null>(null);
+  const [copiedUrl, setCopiedUrl] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Maximum standard browser localStorage quota (~5000 KB = 5 MB)
@@ -216,25 +217,56 @@ export default function StorageHousekeepingModal({
         ? `${cleanInput}/api/health` 
         : (isWebPreview ? '/api/health' : `${DEFAULT_HOSTED_BACKEND_URL}/api/health`);
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
       const res = await fetch(targetUrl, { 
         method: 'GET',
-        headers: { 'Accept': 'application/json' }
+        headers: { 'Accept': 'application/json' },
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
+
+      const text = await res.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        // Returned HTML (like Google login / authorization wall)
+        if (text.includes("<!DOCTYPE") || text.includes("<html") || text.includes("accounts.google.com")) {
+          setConnectionStatus({ 
+            ok: false, 
+            message: `Endpoint redirected to an authentication login page (Google Cloud Run Auth). Please ensure the App is shared or public to allow mobile APK access.` 
+          });
+          return;
+        }
+        setConnectionStatus({ 
+          ok: false, 
+          message: `Unexpected non-JSON response from server (HTTP ${res.status}): ${text.slice(0, 100)}` 
+        });
+        return;
+      }
 
       if (res.ok) {
-        const data = await res.json();
         setConnectionStatus({ 
           ok: true, 
-          message: `Connected successfully! (Server status: ${data.status || 'OK'}, Target: ${cleanInput || (isWebPreview ? 'Local/Current Session' : DEFAULT_HOSTED_BACKEND_URL)})` 
+          message: `Connected successfully! (Status: ${data?.status || 'OK'}, Target: ${cleanInput || (isWebPreview ? 'Local/Current Session' : DEFAULT_HOSTED_BACKEND_URL)})` 
         });
       } else {
-        setConnectionStatus({ ok: false, message: `Server responded with HTTP ${res.status} (${res.statusText || 'Error'})` });
+        setConnectionStatus({ ok: false, message: `Server returned HTTP ${res.status} (${res.statusText || 'Error'})` });
       }
     } catch (err: any) {
-      setConnectionStatus({ 
-        ok: false, 
-        message: err?.message || 'Network error: Unable to reach the server from this environment.' 
-      });
+      if (err.name === 'AbortError') {
+        setConnectionStatus({ 
+          ok: false, 
+          message: 'Connection timed out after 10s. The server may be sleeping or unreachable from this mobile network.' 
+        });
+      } else {
+        setConnectionStatus({ 
+          ok: false, 
+          message: err?.message || 'Network error: Failed to reach the server from this device.' 
+        });
+      }
     } finally {
       setTestingConnection(false);
     }
@@ -252,7 +284,7 @@ export default function StorageHousekeepingModal({
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] shadow-2xl border border-slate-100 flex flex-col relative select-none overflow-hidden my-auto">
+      <div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] shadow-2xl border border-slate-100 flex flex-col relative overflow-hidden my-auto">
         
         {/* Sticky Header */}
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 bg-white/95 backdrop-blur-sm shrink-0 z-10">
@@ -379,13 +411,32 @@ export default function StorageHousekeepingModal({
 
           <div className="space-y-2 pt-1">
             <div className="flex gap-2">
-              <input
-                type="text"
-                value={backendUrl}
-                onChange={(e) => handleSaveBackendUrl(e.target.value)}
-                placeholder={DEFAULT_HOSTED_BACKEND_URL}
-                className="flex-1 px-3 py-2 text-[11px] bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 font-mono text-slate-700"
-              />
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={backendUrl}
+                  onChange={(e) => handleSaveBackendUrl(e.target.value)}
+                  placeholder={DEFAULT_HOSTED_BACKEND_URL}
+                  className="w-full pl-3 pr-8 py-2 text-[11px] bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 font-mono text-slate-700 select-text"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const textToCopy = backendUrl || DEFAULT_HOSTED_BACKEND_URL;
+                    navigator.clipboard?.writeText(textToCopy);
+                    setCopiedUrl(true);
+                    setTimeout(() => setCopiedUrl(false), 2000);
+                  }}
+                  title="Copy URL"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 p-1 cursor-pointer transition-colors"
+                >
+                  {copiedUrl ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
+                </button>
+              </div>
               <button
                 onClick={handleTestBackendConnection}
                 disabled={testingConnection}
