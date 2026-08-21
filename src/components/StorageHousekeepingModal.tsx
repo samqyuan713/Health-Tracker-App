@@ -45,7 +45,7 @@ export default function StorageHousekeepingModal({
     if (isOpen) {
       calculateStorageStats();
       setImportError(null);
-      const saved = localStorage.getItem('vitalstream_custom_backend_url') || DEFAULT_HOSTED_BACKEND_URL;
+      const saved = localStorage.getItem('vitalstream_custom_backend_url') || '';
       setBackendUrl(saved);
       setConnectionStatus(null);
     }
@@ -209,18 +209,31 @@ export default function StorageHousekeepingModal({
     setTestingConnection(true);
     setConnectionStatus(null);
     try {
-      const targetUrl = getFullApiUrl('/api/health');
-      const res = await fetch(targetUrl, { method: 'GET' });
+      const cleanInput = backendUrl.trim().replace(/\/+$/, '');
+      // When in browser preview and no custom override is set, test the direct relative route
+      const isWebPreview = typeof window !== 'undefined' && (window.location.hostname.includes('run.app') || window.location.hostname === 'localhost');
+      const targetUrl = cleanInput 
+        ? `${cleanInput}/api/health` 
+        : (isWebPreview ? '/api/health' : `${DEFAULT_HOSTED_BACKEND_URL}/api/health`);
+
+      const res = await fetch(targetUrl, { 
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      });
+
       if (res.ok) {
         const data = await res.json();
-        setConnectionStatus({ ok: true, message: `Connected! Server time: ${data.time || 'OK'}` });
+        setConnectionStatus({ 
+          ok: true, 
+          message: `Connected successfully! (Server status: ${data.status || 'OK'}, Target: ${cleanInput || (isWebPreview ? 'Local/Current Session' : DEFAULT_HOSTED_BACKEND_URL)})` 
+        });
       } else {
-        setConnectionStatus({ ok: false, message: `Server responded with HTTP ${res.status}` });
+        setConnectionStatus({ ok: false, message: `Server responded with HTTP ${res.status} (${res.statusText || 'Error'})` });
       }
     } catch (err: any) {
       setConnectionStatus({ 
         ok: false, 
-        message: err?.message || 'Failed to connect. Check internet & URL.' 
+        message: err?.message || 'Network error: Unable to reach the server from this environment.' 
       });
     } finally {
       setTestingConnection(false);
@@ -238,27 +251,31 @@ export default function StorageHousekeepingModal({
   const usagePercent = Math.min(100, Math.round((totalStorageKB / MAX_STORAGE_KB) * 100));
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fadeIn">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 flex flex-col gap-5 relative select-none">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-3 sm:p-4 animate-fadeIn overflow-y-auto">
+      <div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] shadow-2xl border border-slate-100 flex flex-col relative select-none overflow-hidden my-auto">
         
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        {/* Sticky Header */}
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 bg-white/95 backdrop-blur-sm shrink-0 z-10">
           <div className="flex items-center gap-2.5">
-            <div className="p-2.5 bg-indigo-50 border border-indigo-100 rounded-2xl text-indigo-600">
+            <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-2xl text-indigo-600">
               <HardDrive className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-slate-800">Storage & Housekeeping</h3>
-              <p className="text-[11px] font-semibold text-slate-400">Mobile Device Cache & Quota Management</p>
+              <h3 className="text-sm sm:text-base font-extrabold text-slate-800">Storage & Housekeeping</h3>
+              <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400">Mobile Device Cache & Quota</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all cursor-pointer"
+            aria-label="Close"
+            className="p-2 text-slate-500 hover:text-slate-700 active:text-slate-900 bg-slate-100 hover:bg-slate-200 active:scale-95 rounded-full transition-all cursor-pointer shadow-xs"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Scrollable Body */}
+        <div className="p-5 overflow-y-auto flex-1 space-y-5 overscroll-contain">
 
         {/* Real-time Storage Meter */}
         <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
@@ -332,8 +349,33 @@ export default function StorageHousekeepingModal({
           </div>
 
           <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-            Routes AI Vision, Coach Leo, and Song Synthesis to your live cloud server when running inside the standalone Android APK.
+            When running inside the standalone Android APK, pick the live cloud URL to connect with Gemini AI services:
           </p>
+
+          {/* Quick preset buttons */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            <button
+              type="button"
+              onClick={() => handleSaveBackendUrl('https://ais-pre-k6z4f6wcf5vfsnc6wxywm7-469255650912.asia-southeast1.run.app')}
+              className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-[9px] font-bold text-slate-700 transition-all active:scale-95 cursor-pointer shadow-xs"
+            >
+              Shared Pre URL
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSaveBackendUrl('https://ais-dev-k6z4f6wcf5vfsnc6wxywm7-469255650912.asia-southeast1.run.app')}
+              className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg text-[9px] font-bold text-slate-700 transition-all active:scale-95 cursor-pointer shadow-xs"
+            >
+              Dev URL
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSaveBackendUrl('')}
+              className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-lg text-[9px] font-bold transition-all active:scale-95 cursor-pointer shadow-xs"
+            >
+              Auto (Default)
+            </button>
+          </div>
 
           <div className="space-y-2 pt-1">
             <div className="flex gap-2">
@@ -347,7 +389,7 @@ export default function StorageHousekeepingModal({
               <button
                 onClick={handleTestBackendConnection}
                 disabled={testingConnection}
-                className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-[10px] font-extrabold flex items-center gap-1 cursor-pointer transition-all active:scale-95 shrink-0"
+                className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-[10px] font-extrabold flex items-center gap-1 cursor-pointer transition-all active:scale-95 shrink-0 shadow-sm"
               >
                 {testingConnection ? (
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -359,7 +401,7 @@ export default function StorageHousekeepingModal({
             </div>
 
             {connectionStatus && (
-              <div className={`p-2 rounded-xl text-[10px] font-bold flex items-center gap-1.5 ${
+              <div className={`p-2.5 rounded-xl text-[10px] font-bold flex items-center gap-1.5 ${
                 connectionStatus.ok 
                   ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
                   : 'bg-rose-50 text-rose-700 border border-rose-200'
@@ -369,7 +411,7 @@ export default function StorageHousekeepingModal({
                 ) : (
                   <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-rose-600" />
                 )}
-                <span>{connectionStatus.message}</span>
+                <span className="break-all">{connectionStatus.message}</span>
               </div>
             )}
           </div>
@@ -385,7 +427,7 @@ export default function StorageHousekeepingModal({
             {/* Export JSON Backup */}
             <button
               onClick={handleExportBackup}
-              className="p-3 bg-emerald-50/80 hover:bg-emerald-100 border border-emerald-200 rounded-2xl flex flex-col items-start gap-1 text-left transition-all active:scale-98 cursor-pointer"
+              className="p-3 bg-emerald-50/80 hover:bg-emerald-100 border border-emerald-200 rounded-2xl flex flex-col items-start gap-1 text-left transition-all active:scale-98 cursor-pointer shadow-xs"
             >
               <div className="flex items-center gap-1.5 text-emerald-700 font-extrabold text-xs">
                 <Download className="w-4 h-4" />
@@ -399,7 +441,7 @@ export default function StorageHousekeepingModal({
             {/* Restore JSON Backup */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="p-3 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200 rounded-2xl flex flex-col items-start gap-1 text-left transition-all active:scale-98 cursor-pointer"
+              className="p-3 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200 rounded-2xl flex flex-col items-start gap-1 text-left transition-all active:scale-98 cursor-pointer shadow-xs"
             >
               <div className="flex items-center gap-1.5 text-indigo-700 font-extrabold text-xs">
                 <Upload className="w-4 h-4" />
@@ -426,7 +468,7 @@ export default function StorageHousekeepingModal({
           </span>
 
           {/* Action 1: Purge Heavy Photos */}
-          <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-2xl hover:border-indigo-200 transition-all">
+          <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-2xl hover:border-indigo-200 transition-all shadow-xs">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
                 <Image className="w-4 h-4" />
@@ -448,7 +490,7 @@ export default function StorageHousekeepingModal({
           </div>
 
           {/* Action 2: Clear AI Chat Memory */}
-          <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-2xl hover:border-indigo-200 transition-all">
+          <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-2xl hover:border-indigo-200 transition-all shadow-xs">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
                 <MessageSquare className="w-4 h-4" />
@@ -470,7 +512,7 @@ export default function StorageHousekeepingModal({
           </div>
 
           {/* Action 3: Archive logs older than 30 days */}
-          <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-2xl hover:border-indigo-200 transition-all">
+          <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-2xl hover:border-indigo-200 transition-all shadow-xs">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                 <RefreshCw className="w-4 h-4" />
@@ -490,7 +532,7 @@ export default function StorageHousekeepingModal({
         </div>
 
         {/* Footer info & Factory reset button */}
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+        <div className="pt-2 flex items-center justify-between">
           <button
             onClick={handleFactoryReset}
             className="flex items-center gap-1.5 text-rose-600 hover:text-rose-700 text-[10px] font-bold uppercase transition-all cursor-pointer"
@@ -502,6 +544,18 @@ export default function StorageHousekeepingModal({
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
             <span>100% On-Device Privacy</span>
           </div>
+        </div>
+
+        </div>
+
+        {/* Sticky Footer Dismiss Bar */}
+        <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-end shrink-0">
+          <button
+            onClick={onClose}
+            className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 active:scale-98 text-white rounded-2xl text-xs font-extrabold transition-all cursor-pointer shadow-sm text-center"
+          >
+            Done / Close Modal
+          </button>
         </div>
 
       </div>
