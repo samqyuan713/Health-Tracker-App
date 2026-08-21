@@ -1,14 +1,13 @@
 import express from "express";
 import path from "path";
-import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Safe resolution for both CommonJS (esbuild bundle) and ESM (tsx dev)
+const currentDir = typeof __dirname !== "undefined" ? __dirname : process.cwd();
 
 function generateCustomSongLocal(prompt: string, tempo: number, style: string, errorNotice?: string) {
   const promptLower = prompt.toLowerCase();
@@ -181,7 +180,7 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 3, delayMs = 600): P
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
   // Body parser with support for base64 camera image uploads up to 25MB
   app.use(express.json({ limit: "25mb" }));
