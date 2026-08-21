@@ -381,8 +381,12 @@ export default function StorageHousekeepingModal({
           </div>
 
           <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-            When running inside the standalone Android APK, pick the live cloud URL to connect with Gemini AI services:
+            Standalone mobile APKs connect to your hosted Cloud Run instance for Gemini AI Vision and Coach services.
           </p>
+
+          <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-2 text-[9.5px] text-amber-900 leading-snug">
+            <span className="font-bold">Important for Android APK:</span> Cloud Run URLs (<code className="font-mono bg-amber-100/80 px-1 py-0.5 rounded">ais-dev</code> / <code className="font-mono bg-amber-100/80 px-1 py-0.5 rounded">ais-pre</code>) require the applet to be <span className="font-bold">Shared / Deployed</span> via the top-right AI Studio menu to allow public unauthenticated mobile access.
+          </div>
 
           {/* Quick preset buttons */}
           <div className="flex flex-wrap items-center gap-1.5 pt-1">
