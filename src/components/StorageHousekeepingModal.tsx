@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { HardDrive, Trash2, Image, MessageSquare, Database, RefreshCw, Check, AlertTriangle, ShieldCheck, X, Download, Upload, FileJson, Globe, Wifi, Server, Copy } from 'lucide-react';
+import { HardDrive, Trash2, Image, MessageSquare, Database, RefreshCw, Check, AlertTriangle, ShieldCheck, X, Download, Upload, FileJson, Globe, Wifi, Server, Copy, Languages } from 'lucide-react';
 import { MetricLog, ChatMessage, DailyGoals } from '../types';
 import { exportHealthBackupJSON, DEFAULT_GOALS, DEFAULT_HOSTED_BACKEND_URL, getApiBaseUrl, getFullApiUrl } from '../utils';
+import { SupportedLanguage, TRANSLATIONS, getTranslation } from '../utils/i18n';
 
 interface StorageHousekeepingModalProps {
   isOpen: boolean;
@@ -13,6 +14,8 @@ interface StorageHousekeepingModalProps {
   onUpdateLogs: (logs: MetricLog[]) => void;
   onUpdateGoals?: (goals: DailyGoals) => void;
   onUpdateChat: (chat: ChatMessage[]) => void;
+  currentLang?: SupportedLanguage;
+  onSelectLanguage?: (lang: SupportedLanguage) => void;
 }
 
 export default function StorageHousekeepingModal({
@@ -24,7 +27,9 @@ export default function StorageHousekeepingModal({
   chatHistory,
   onUpdateLogs,
   onUpdateGoals,
-  onUpdateChat
+  onUpdateChat,
+  currentLang = 'en',
+  onSelectLanguage
 }: StorageHousekeepingModalProps) {
   const [logsStorageKB, setLogsStorageKB] = useState<number>(0);
   const [photosCount, setPhotosCount] = useState<number>(0);
@@ -365,6 +370,48 @@ export default function StorageHousekeepingModal({
           <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold p-3 rounded-2xl flex items-center gap-2 animate-fadeIn">
             <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
             <span>{importError}</span>
+          </div>
+        )}
+
+        {/* Language Selection Setting */}
+        {onSelectLanguage && (
+          <div className="space-y-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-extrabold text-slate-700 uppercase tracking-widest flex items-center gap-1.5">
+                <Languages className="w-3.5 h-3.5 text-indigo-600" />
+                Language / 语言 / 言語
+              </span>
+              <span className="text-[9px] font-mono text-indigo-600 bg-indigo-50 font-bold px-1.5 py-0.5 rounded border border-indigo-100 uppercase">
+                {currentLang}
+              </span>
+            </div>
+            <p className="text-[10px] text-slate-500 font-medium">
+              Synchronize labels and UI language across this mobile device and web browser.
+            </p>
+            <div className="grid grid-cols-3 gap-1.5 pt-1">
+              {[
+                { code: 'en' as SupportedLanguage, label: 'English', flag: '🇺🇸' },
+                { code: 'zh-CN' as SupportedLanguage, label: '简体中文', flag: '🇨🇳' },
+                { code: 'zh-TW' as SupportedLanguage, label: '繁體中文', flag: '🇭🇰' },
+                { code: 'ja' as SupportedLanguage, label: '日本語', flag: '🇯🇵' },
+                { code: 'ko' as SupportedLanguage, label: '한국어', flag: '🇰🇷' },
+                { code: 'km' as SupportedLanguage, label: 'ភាសាខ្មែរ', flag: '🇰🇭' },
+              ].map((item) => (
+                <button
+                  key={item.code}
+                  type="button"
+                  onClick={() => onSelectLanguage(item.code)}
+                  className={`py-1.5 px-2 rounded-xl text-[10px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
+                    currentLang === item.code
+                      ? 'bg-indigo-600 text-white shadow-xs font-black'
+                      : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                  }`}
+                >
+                  <span>{item.flag}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
