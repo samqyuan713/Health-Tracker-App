@@ -37,57 +37,57 @@ export default function Analytics({ logs, goals, currentLang = 'en' }: Analytics
   // Metric metadata designed with light color palettes
   const meta: Record<TabType, { label: string; unit: string; color: string; bg: string; target: number; desc: string; icon: any }> = {
     steps: { 
-      label: t.stepsWalked, 
-      unit: t.steps, 
+      label: t.steps || 'Steps', 
+      unit: 'steps', 
       color: '#10b981', // Emerald-500
       bg: 'rgba(16, 185, 129, 0.08)',
       target: goals.steps,
-      desc: t.activityIndex,
+      desc: t.stepsWalked || 'Steps Walked',
       icon: <Activity className="w-5 h-5 text-emerald-600" />
     },
     water: { 
-      label: t.waterIntake, 
+      label: t.water || 'Water', 
       unit: 'ml', 
       color: '#0284c7', // Sky-600
       bg: 'rgba(2, 132, 199, 0.08)',
       target: goals.water,
-      desc: t.water,
+      desc: t.waterIntake || 'Water Intake',
       icon: <Droplet className="w-5 h-5 text-sky-600" />
     },
     calories: { 
-      label: t.energyBurned, 
+      label: t.calories || 'Calories', 
       unit: 'kcal', 
       color: '#e11d48', // Rose-600
       bg: 'rgba(225, 29, 72, 0.08)',
       target: goals.calories,
-      desc: t.burn,
+      desc: t.energyBurned || 'Calories burned',
       icon: <Flame className="w-5 h-5 text-rose-600" />
     },
     sleep: { 
-      label: t.sleepPattern, 
+      label: t.sleep || 'Sleep', 
       unit: 'hrs', 
       color: '#4f46e5', // Indigo-600
       bg: 'rgba(79, 70, 229, 0.08)',
       target: goals.sleep,
-      desc: t.sleepQuality,
+      desc: t.sleepQuality || 'Sleep quality',
       icon: <Moon className="w-5 h-5 text-indigo-600" />
     },
     weight: { 
-      label: t.bodyWeight, 
+      label: t.weight || 'Weight', 
       unit: 'kg', 
       color: '#6366f1', // Violet-500
       bg: 'rgba(99, 102, 241, 0.08)',
       target: 74, 
-      desc: t.weight,
+      desc: t.bodyWeight || 'Body Weight',
       icon: <Scale className="w-5 h-5 text-indigo-500" />
     },
     food: {
-      label: t.foodIntake,
+      label: t.food || 'Food',
       unit: 'kcal',
       color: '#d97706', // Amber-600
       bg: 'rgba(217, 119, 6, 0.08)',
       target: goals.food || 2000,
-      desc: t.calories,
+      desc: t.foodIntake || 'Food Intake',
       icon: <Utensils className="w-5 h-5 text-amber-600" />
     }
   };
@@ -127,15 +127,15 @@ export default function Analytics({ logs, goals, currentLang = 'en' }: Analytics
     <div className="flex-1 flex flex-col overflow-y-auto px-4 pb-20 pt-2 select-none scrollbar-none bg-slate-50/40">
       
       {/* Title */}
-      <div className="mb-3.5 mt-1 select-none">
+      <div className="mb-3 mt-1 select-none">
         <h2 className="text-base font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
           Vitals Analytics
         </h2>
-        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Weekly performance & trends</p>
+        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Weekly performance & trends</p>
       </div>
 
       {/* Pill Selectors */}
-      <div id="analytics-metric-tabs" className="flex gap-1 overflow-x-auto pb-2.5 scrollbar-none mb-3 -mx-1 px-1 shrink-0">
+      <div id="analytics-metric-tabs" className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none mb-3 -mx-1 px-1 shrink-0">
         {(Object.keys(meta) as TabType[]).map((tab) => {
           const isActive = activeTab === tab;
           return (
@@ -146,44 +146,44 @@ export default function Analytics({ logs, goals, currentLang = 'en' }: Analytics
                 setActiveTab(tab);
                 setHoverIndex(null);
               }}
-              className={`px-3 py-1.5 rounded-xl text-[9px] font-extrabold uppercase tracking-widest shrink-0 transition-all cursor-pointer border ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer border ${
                 isActive 
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm' 
-                  : 'bg-white text-slate-555 border-slate-200/75 hover:text-slate-800 shadow-sm'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' 
+                  : 'bg-white text-slate-600 border-slate-200/80 hover:bg-slate-50'
               }`}
             >
-              {tab}
+              {meta[tab].label}
             </button>
           );
         })}
       </div>
 
       {/* Chart Canvas Card */}
-      <div className="bg-white rounded-2xl border border-slate-200/75 p-4 mb-4 select-none relative overflow-hidden shadow-sm">
+      <div className="bg-white rounded-2xl border border-slate-200/80 pt-2 px-4 pb-4 sm:pt-2.5 sm:px-5 sm:pb-5 mb-4 select-none relative overflow-hidden shadow-xs">
         
         {/* Dynamic Soft Tint Light Overlay */}
         <div 
-          className="absolute top-0 right-0 w-24 h-24 rounded-full blur-[30px] opacity-25 pointer-events-none"
+          className="absolute top-0 right-0 w-28 h-28 rounded-full blur-[28px] opacity-25 pointer-events-none"
           style={{ backgroundColor: currentMeta.color }}
         ></div>
 
-        <div className="flex items-start justify-between mb-1 relative z-10">
+        {/* Elevated Header with ONLY multi-word title */}
+        <div className="flex items-center justify-between mb-1 relative z-10 -mt-1.5">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-slate-50 rounded-lg">
+            <div className="p-1.5 bg-slate-50 rounded-xl border border-slate-100/80 shrink-0">
               {currentMeta.icon}
             </div>
-            <div>
-              <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-tight">{currentMeta.label}</h4>
-              <p className="text-[9px] text-slate-400 font-medium tracking-tight leading-none">{currentMeta.desc}</p>
-            </div>
+            <h4 className="text-sm sm:text-base font-bold text-slate-800 leading-none">
+              {currentMeta.desc}
+            </h4>
           </div>
-          <span className="text-[9px] font-mono font-bold px-2 py-0.5 text-slate-500 bg-slate-50 rounded-lg border border-slate-200/60 leading-none">
+          <span className="text-xs font-mono font-bold px-2 py-0.5 text-slate-600 bg-slate-50 rounded-lg border border-slate-200/70 shrink-0">
             7D Range
           </span>
         </div>
 
         {/* Inline SVG Chart Canvas */}
-        <div className="relative h-[180px] w-full flex justify-center mt-2">
+        <div className="relative h-[170px] w-full flex justify-center mt-1">
           <svg className="w-full h-full max-w-[340px]" viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
             
             {/* Gridlines */}
@@ -318,26 +318,26 @@ export default function Analytics({ logs, goals, currentLang = 'en' }: Analytics
       </div>
 
       {/* Summary insights panel */}
-      <h3 className="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-2">Weekly Insights</h3>
+      <h3 className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-2">Weekly Insights</h3>
       <div className="space-y-2.5">
         
         {/* Metric Overview totals and Averages */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2.5">
           
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/70 shadow-sm select-none">
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Weekly Average</span>
-            <span className="text-base font-black text-slate-800 block font-mono mt-0.5 leading-snug">
-              {avgValue.toLocaleString()} <span className="text-[10px] font-bold text-slate-400">{currentMeta.unit}</span>
+          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/70 shadow-xs select-none">
+            <span className="text-xs font-medium text-slate-400 block">Weekly Average</span>
+            <span className="text-lg font-black text-slate-800 block font-mono my-0.5">
+              {avgValue.toLocaleString()} <span className="text-[10px] font-normal text-slate-400">{currentMeta.unit}</span>
             </span>
-            <span className="text-[8px] text-slate-400 font-medium block mt-1">Total sum: {totalValue.toLocaleString()}</span>
+            <span className="text-[10px] text-slate-400">Total sum: {totalValue.toLocaleString()}</span>
           </div>
 
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/70 shadow-sm select-none">
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Goals Completed</span>
-            <span className="text-base font-black text-slate-800 block font-mono mt-0.5 leading-snug flex items-baseline gap-0.5">
-              {activeTab === 'weight' ? '7' : `${goalsMetCount}`} <span className="text-[10px] font-bold text-slate-450">/ 7 days</span>
+          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/70 shadow-xs select-none">
+            <span className="text-xs font-medium text-slate-400 block">Goals Completed</span>
+            <span className="text-lg font-black text-slate-800 block font-mono my-0.5">
+              {activeTab === 'weight' ? '7' : `${goalsMetCount}`} <span className="text-[10px] font-normal text-slate-400">/ 7 days</span>
             </span>
-            <span className="text-[8px] text-amber-600 font-bold block mt-1">
+            <span className="text-[10px] text-amber-600 font-bold">
               {activeTab === 'weight' ? 'Maintaining base range' : `${Math.round((goalsMetCount / 7) * 100)}% compliance`}
             </span>
           </div>
@@ -345,14 +345,14 @@ export default function Analytics({ logs, goals, currentLang = 'en' }: Analytics
         </div>
 
         {/* Coach Insight Snippet box matching VitalStream look */}
-        <div className="bg-emerald-50 border border-emerald-100 p-3.5 rounded-2xl select-none shadow-sm">
+        <div className="bg-emerald-50 border border-emerald-100 p-3.5 rounded-2xl select-none">
           <div className="flex items-start gap-2.5">
-            <div className="p-1 bg-emerald-100 rounded-lg shrink-0">
+            <div className="p-1.5 bg-emerald-100 rounded-lg shrink-0 mt-0.5">
               <Sparkles className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
             </div>
             <div>
-              <h5 className="text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider">Coach Leo's Tip</h5>
-              <p className="text-[10px] text-emerald-950/85 mt-0.5 leading-relaxed font-semibold">
+              <h5 className="text-xs font-bold text-emerald-800">Coach Leo's Tip</h5>
+              <p className="text-xs text-emerald-950/80 mt-0.5 leading-relaxed font-medium">
                 {activeTab === 'steps' && avgValue >= DEFAULT_GOALS.steps
                   ? "Outstanding aeroradial stamina building! You averaged above your 10K step goal this week. Maintain this beautiful momentum tomorrow."
                   : activeTab === 'steps'
