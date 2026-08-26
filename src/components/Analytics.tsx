@@ -95,7 +95,7 @@ export default function Analytics({ logs, goals, currentLang = 'en' }: Analytics
   const currentMeta = meta[activeTab];
 
   // SVG Dimension constants
-  const svgHeight = 220;
+  const svgHeight = 170;
   const svgWidth = 320;
   const paddingLeft = 32;
   const paddingRight = 12;
@@ -146,7 +146,7 @@ export default function Analytics({ logs, goals, currentLang = 'en' }: Analytics
                 setActiveTab(tab);
                 setHoverIndex(null);
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer border ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer border flex items-center justify-center leading-normal ${
                 isActive 
                   ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' 
                   : 'bg-white text-slate-600 border-slate-200/80 hover:bg-slate-50'
@@ -159,7 +159,7 @@ export default function Analytics({ logs, goals, currentLang = 'en' }: Analytics
       </div>
 
       {/* Chart Canvas Card */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 pt-2 px-4 pb-4 sm:pt-2.5 sm:px-5 sm:pb-5 mb-4 select-none relative overflow-hidden shadow-xs">
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 mb-4 select-none relative overflow-visible shadow-xs">
         
         {/* Dynamic Soft Tint Light Overlay */}
         <div 
@@ -167,17 +167,19 @@ export default function Analytics({ logs, goals, currentLang = 'en' }: Analytics
           style={{ backgroundColor: currentMeta.color }}
         ></div>
 
-        {/* Elevated Header with ONLY multi-word title */}
-        <div className="flex items-center justify-between mb-1 relative z-10 -mt-1.5">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-slate-50 rounded-xl border border-slate-100/80 shrink-0">
+        {/* Top-Aligned Header with Full Text Visibility */}
+        <div className="flex items-start justify-between mb-2 relative z-10">
+          <div className="flex items-start gap-2.5">
+            <div className="p-1.5 bg-slate-50 rounded-xl border border-slate-100/80 shrink-0 flex items-center justify-center">
               {currentMeta.icon}
             </div>
-            <h4 className="text-sm sm:text-base font-bold text-slate-800 leading-none">
-              {currentMeta.desc}
-            </h4>
+            <div className="flex flex-col justify-start pt-0.5">
+              <h4 className="text-sm sm:text-base font-bold text-slate-800 leading-snug">
+                {currentMeta.desc}
+              </h4>
+            </div>
           </div>
-          <span className="text-xs font-mono font-bold px-2 py-0.5 text-slate-600 bg-slate-50 rounded-lg border border-slate-200/70 shrink-0">
+          <span className="text-xs font-mono font-bold px-2 py-0.5 text-slate-600 bg-slate-50 rounded-lg border border-slate-200/70 shrink-0 mt-0.5">
             7D Range
           </span>
         </div>
