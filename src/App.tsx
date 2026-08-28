@@ -21,6 +21,7 @@ import {
   Plus,
   Camera,
   Music,
+  UserCheck,
   HardDrive,
   Crown,
   Zap,
@@ -295,13 +296,13 @@ export default function App() {
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
             {t.watchSyncActive}
           </div>
-          {/* Language / Asian Languages Selector Dropdown (Desktop) */}
-          <div className="hidden md:flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 p-1 px-2 rounded-2xl border border-slate-200/80 text-[10px] font-bold">
+          {/* Language / Asian Languages Selector Dropdown */}
+          <div className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 p-1 px-1.5 sm:px-2 rounded-2xl border border-slate-200/80 text-[10px] font-bold">
             <Globe className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
             <select
               value={currentLang}
               onChange={(e) => handleLanguageChange(e.target.value as SupportedLanguage)}
-              className="bg-transparent font-extrabold text-slate-800 text-[10px] focus:outline-none cursor-pointer py-1"
+              className="bg-transparent font-extrabold text-slate-800 text-[10px] focus:outline-none cursor-pointer py-1 max-w-[70px] sm:max-w-none"
               title={t.selectLanguage}
             >
               <option value="en">English (US)</option>
@@ -313,10 +314,10 @@ export default function App() {
             </select>
           </div>
 
-          {/* Storage & Backup (Desktop) */}
+          {/* Storage & Backup */}
           <button
             onClick={() => setIsHousekeepingOpen(true)}
-            className="hidden md:flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 px-3 rounded-2xl text-[10px] font-extrabold uppercase transition-all active:scale-95 cursor-pointer shadow-2xs"
+            className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 p-1.5 sm:p-2 px-2 sm:px-3 rounded-2xl text-[10px] font-extrabold uppercase transition-all active:scale-95 cursor-pointer shadow-2xs shrink-0"
             title="Inspect & Clean Local Phone Storage"
           >
             <HardDrive className="w-3.5 h-3.5 text-indigo-600" />
@@ -336,27 +337,6 @@ export default function App() {
               {userTier === 'pro' ? t.proUnlimited : userTier === 'payg' ? `${t.credits}: ${paygCredits}` : t.proUpgrade}
             </span>
           </button>
-          
-          <div className="hidden md:block h-6 w-[1px] bg-slate-200"></div>
-          
-          {/* Interactive Google Sign-In & User Account Profile Trigger */}
-          <div 
-            onClick={() => setIsAuthModalOpen(true)}
-            className="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition-all bg-slate-50 hover:bg-slate-100 p-1.5 px-3 rounded-2xl border border-slate-200/90 shadow-2xs group"
-            title="Click to switch or sign in with Google ID"
-          >
-            <div className="text-right">
-              <p className="text-[9px] font-extrabold text-emerald-600 uppercase tracking-widest leading-none flex items-center justify-end gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> {t.googleIdConnected}
-              </p>
-              <p className="text-xs font-black text-slate-800 font-sans tracking-tight group-hover:text-emerald-700 transition-colors">
-                {currentUser.name}
-              </p>
-            </div>
-            <div className="w-9 h-9 rounded-full bg-slate-900 border border-slate-200 shadow-sm flex items-center justify-center text-white font-black text-xs select-none">
-              {currentUser.name.substring(0, 2).toUpperCase()}
-            </div>
-          </div>
         </div>
       </nav>
 
@@ -423,6 +403,22 @@ export default function App() {
           
           <MobileFrame>
             
+            {/* Mobile Top User Account / Google ID Header Bar */}
+            <div className="bg-slate-900 text-white px-3.5 py-2 flex items-center justify-between text-[10px] shrink-0 border-b border-slate-800 shadow-xs select-none">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></div>
+                <span className="font-extrabold tracking-tight truncate text-slate-100">{currentUser.name}</span>
+                <span className="text-slate-400 truncate text-[9px] hidden sm:inline">({currentUser.email})</span>
+              </div>
+              <button 
+                onClick={() => setIsAuthModalOpen(true)}
+                className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold text-[8px] uppercase tracking-wider rounded-md cursor-pointer transition-all shrink-0 flex items-center gap-1 shadow-2xs"
+                title="Google ID Health Access"
+              >
+                <UserCheck className="w-2.5 h-2.5" /> Google ID
+              </button>
+            </div>
+
             {/* Dynamic Tab View routing inside the shell phone frame */}
             <div className="flex-1 flex flex-col overflow-hidden relative">
               {activeTab === 'dashboard' && (
