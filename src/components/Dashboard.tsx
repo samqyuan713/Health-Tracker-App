@@ -277,20 +277,29 @@ export default function Dashboard({
         <div 
           id="steps-widget-card"
           onClick={() => onOpenLogModal('steps')}
-          className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs hover:border-emerald-250 transition-all flex items-center justify-between cursor-pointer group hover:shadow-sm min-h-[88px]"
+          className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs hover:border-emerald-250 transition-all flex items-center justify-between cursor-pointer group hover:shadow-sm min-h-[92px] gap-2.5"
         >
-          <div className="flex flex-col justify-between self-stretch min-w-0 pr-1 flex-1">
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-tight flex items-center gap-1.5 leading-none">
-              <Activity className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-              <span>{t.steps}</span>
+          <div className="flex flex-col justify-between self-stretch min-w-0 pr-2 flex-1">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-tight flex items-start gap-1.5 leading-snug">
+              <Activity className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+              <div className="flex flex-col leading-tight min-w-0">
+                {currentLang === 'en' ? (
+                  <>
+                    <span>Steps</span>
+                    <span>walked</span>
+                  </>
+                ) : (
+                  <span className="leading-tight break-words">{t.stepsWalked || t.steps}</span>
+                )}
+              </div>
             </div>
-            <div className="mt-1.5">
+            <div className="mt-1">
               <div className="text-lg font-black text-slate-800 tracking-tight leading-tight">{stats.steps.toLocaleString()}</div>
               <div className="text-[10px] font-mono text-slate-400 leading-tight mt-0.5">Goal: {goals.steps / 1000}k</div>
             </div>
           </div>
-          <div className="shrink-0 flex items-center justify-center">
-            <CircularProgress percent={stepsPct} strokeColor="#059669" size={48}>
+          <div className="shrink-0 flex items-center justify-center pl-1">
+            <CircularProgress percent={stepsPct} strokeColor="#059669" size={46} strokeWidth={4.5}>
               <span className="text-[10px] font-extrabold font-mono text-emerald-600">{stepsPct}%</span>
             </CircularProgress>
           </div>
@@ -300,20 +309,29 @@ export default function Dashboard({
         <div 
           id="water-widget-card"
           onClick={() => onOpenLogModal('water')}
-          className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs hover:border-sky-250 transition-all flex items-center justify-between cursor-pointer group hover:shadow-sm min-h-[88px]"
+          className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs hover:border-sky-250 transition-all flex items-center justify-between cursor-pointer group hover:shadow-sm min-h-[92px] gap-2.5"
         >
-          <div className="flex flex-col justify-between self-stretch min-w-0 pr-1 flex-1">
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-tight flex items-center gap-1.5 leading-none">
-              <Droplet className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-              <span>{t.water}</span>
+          <div className="flex flex-col justify-between self-stretch min-w-0 pr-2 flex-1">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-tight flex items-start gap-1.5 leading-snug">
+              <Droplet className="w-3.5 h-3.5 text-sky-500 shrink-0 mt-0.5" />
+              <div className="flex flex-col leading-tight min-w-0">
+                {currentLang === 'en' ? (
+                  <>
+                    <span>Water</span>
+                    <span>Intake</span>
+                  </>
+                ) : (
+                  <span className="leading-tight break-words">{t.waterIntake || t.water}</span>
+                )}
+              </div>
             </div>
-            <div className="mt-1.5">
+            <div className="mt-1">
               <div className="text-lg font-black text-slate-800 tracking-tight leading-tight">{(stats.water / 1000).toFixed(1)}L</div>
               <div className="text-[10px] font-mono text-slate-400 leading-tight mt-0.5">Goal: {(goals.water / 1000).toFixed(1)}L</div>
             </div>
           </div>
-          <div className="shrink-0 flex items-center justify-center">
-            <CircularProgress percent={waterPct} strokeColor="#0284c7" size={48}>
+          <div className="shrink-0 flex items-center justify-center pl-1">
+            <CircularProgress percent={waterPct} strokeColor="#0284c7" size={46} strokeWidth={4.5}>
               <span className="text-[10px] font-extrabold font-mono text-sky-600">{waterPct}%</span>
             </CircularProgress>
           </div>
@@ -323,20 +341,29 @@ export default function Dashboard({
         <div 
           id="calories-widget-card"
           onClick={() => onOpenLogModal('calories')}
-          className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs hover:border-rose-250 transition-all flex items-center justify-between cursor-pointer group hover:shadow-sm min-h-[88px]"
+          className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs hover:border-rose-250 transition-all flex items-center justify-between cursor-pointer group hover:shadow-sm min-h-[92px] gap-2.5"
         >
-          <div className="flex flex-col justify-between self-stretch min-w-0 pr-1 flex-1">
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-tight flex items-center gap-1.5 leading-none">
-              <Flame className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-              <span>{t.calories}</span>
+          <div className="flex flex-col justify-between self-stretch min-w-0 pr-2 flex-1">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-tight flex items-start gap-1.5 leading-snug">
+              <Flame className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+              <div className="flex flex-col leading-tight min-w-0">
+                {currentLang === 'en' ? (
+                  <>
+                    <span>Calories</span>
+                    <span>burned</span>
+                  </>
+                ) : (
+                  <span className="leading-tight break-words">{t.energyBurned || t.calories}</span>
+                )}
+              </div>
             </div>
-            <div className="mt-1.5">
+            <div className="mt-1">
               <div className="text-lg font-black text-slate-800 tracking-tight leading-tight">{stats.calories} <span className="text-[10px] font-normal text-slate-500">kcal</span></div>
               <div className="text-[10px] font-mono text-slate-400 leading-tight mt-0.5">Goal: {goals.calories}</div>
             </div>
           </div>
-          <div className="shrink-0 flex items-center justify-center">
-            <CircularProgress percent={burnPct} strokeColor="#e11d48" size={48}>
+          <div className="shrink-0 flex items-center justify-center pl-1">
+            <CircularProgress percent={burnPct} strokeColor="#e11d48" size={46} strokeWidth={4.5}>
               <span className="text-[10px] font-extrabold font-mono text-rose-600">{burnPct}%</span>
             </CircularProgress>
           </div>
@@ -346,20 +373,29 @@ export default function Dashboard({
         <div 
           id="sleep-widget-card"
           onClick={() => onOpenLogModal('sleep')}
-          className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs hover:border-indigo-250 transition-all flex items-center justify-between cursor-pointer group hover:shadow-sm min-h-[88px]"
+          className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs hover:border-indigo-250 transition-all flex items-center justify-between cursor-pointer group hover:shadow-sm min-h-[92px] gap-2.5"
         >
-          <div className="flex flex-col justify-between self-stretch min-w-0 pr-1 flex-1">
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-tight flex items-center gap-1.5 leading-none">
-              <Moon className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-              <span>{t.sleep}</span>
+          <div className="flex flex-col justify-between self-stretch min-w-0 pr-2 flex-1">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-tight flex items-start gap-1.5 leading-snug">
+              <Moon className="w-3.5 h-3.5 text-indigo-500 shrink-0 mt-0.5" />
+              <div className="flex flex-col leading-tight min-w-0">
+                {currentLang === 'en' ? (
+                  <>
+                    <span>Sleep</span>
+                    <span>quality</span>
+                  </>
+                ) : (
+                  <span className="leading-tight break-words">{t.sleepQuality || t.sleepPattern || t.sleep}</span>
+                )}
+              </div>
             </div>
-            <div className="mt-1.5">
+            <div className="mt-1">
               <div className="text-lg font-black text-slate-800 tracking-tight leading-tight">{stats.sleep} <span className="text-[10px] font-normal text-slate-500">hrs</span></div>
               <div className="text-[10px] font-mono text-slate-400 leading-tight mt-0.5">Goal: {goals.sleep} hrs</div>
             </div>
           </div>
-          <div className="shrink-0 flex items-center justify-center">
-            <CircularProgress percent={sleepPct} strokeColor="#4f46e5" size={48}>
+          <div className="shrink-0 flex items-center justify-center pl-1">
+            <CircularProgress percent={sleepPct} strokeColor="#4f46e5" size={46} strokeWidth={4.5}>
               <span className="text-[10px] font-extrabold font-mono text-indigo-600">{sleepPct}%</span>
             </CircularProgress>
           </div>
