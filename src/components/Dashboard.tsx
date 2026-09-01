@@ -293,9 +293,9 @@ export default function Dashboard({
                 )}
               </div>
             </div>
-            <div className="mt-1">
+            <div className="mt-1 min-w-0">
               <div className="text-base sm:text-lg font-black text-slate-800 tracking-tight leading-tight">{stats.steps.toLocaleString()}</div>
-              <div className="text-[9px] sm:text-[9.5px] font-mono text-slate-400 leading-tight mt-0.5">Goal: {goals.steps / 1000}k</div>
+              <div className="text-[9px] sm:text-[9.5px] font-mono text-slate-400 leading-tight mt-0.5 whitespace-nowrap truncate">Goal: {goals.steps / 1000}k</div>
             </div>
           </div>
           <div className="shrink-0 flex items-center justify-center">
@@ -325,9 +325,9 @@ export default function Dashboard({
                 )}
               </div>
             </div>
-            <div className="mt-1">
+            <div className="mt-1 min-w-0">
               <div className="text-base sm:text-lg font-black text-slate-800 tracking-tight leading-tight">{(stats.water / 1000).toFixed(1)}L</div>
-              <div className="text-[9px] sm:text-[9.5px] font-mono text-slate-400 leading-tight mt-0.5">Goal: {(goals.water / 1000).toFixed(1)}L</div>
+              <div className="text-[9px] sm:text-[9.5px] font-mono text-slate-400 leading-tight mt-0.5 whitespace-nowrap truncate">Goal: {(goals.water / 1000).toFixed(1)}L</div>
             </div>
           </div>
           <div className="shrink-0 flex items-center justify-center">
@@ -357,9 +357,9 @@ export default function Dashboard({
                 )}
               </div>
             </div>
-            <div className="mt-1">
+            <div className="mt-1 min-w-0">
               <div className="text-base sm:text-lg font-black text-slate-800 tracking-tight leading-tight">{stats.calories} <span className="text-[10px] font-normal text-slate-500">kcal</span></div>
-              <div className="text-[9px] sm:text-[9.5px] font-mono text-slate-400 leading-tight mt-0.5">Goal: {goals.calories}</div>
+              <div className="text-[9px] sm:text-[9.5px] font-mono text-slate-400 leading-tight mt-0.5 whitespace-nowrap truncate">Goal: {goals.calories}</div>
             </div>
           </div>
           <div className="shrink-0 flex items-center justify-center">
@@ -389,9 +389,9 @@ export default function Dashboard({
                 )}
               </div>
             </div>
-            <div className="mt-1">
+            <div className="mt-1 min-w-0">
               <div className="text-base sm:text-lg font-black text-slate-800 tracking-tight leading-tight">{stats.sleep} <span className="text-[10px] font-normal text-slate-500">hrs</span></div>
-              <div className="text-[9px] sm:text-[9.5px] font-mono text-slate-400 leading-tight mt-0.5">Goal: {goals.sleep} hrs</div>
+              <div className="text-[9px] sm:text-[9.5px] font-mono text-slate-400 leading-tight mt-0.5 whitespace-nowrap truncate">Goal: {goals.sleep} hrs</div>
             </div>
           </div>
           <div className="shrink-0 flex items-center justify-center">
@@ -554,23 +554,23 @@ export default function Dashboard({
               return (
                 <div 
                   key={log.id} 
-                  className="flex items-center justify-between p-3.5 bg-white rounded-2xl border border-slate-100 hover:border-slate-200 shadow-sm transition-all h-[88px] min-h-[88px]"
+                  className="flex items-center justify-between py-2 px-3 bg-white rounded-xl border border-slate-100/90 hover:border-slate-200 shadow-2xs transition-all"
                 >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="p-2.5 bg-slate-50 rounded-xl shrink-0">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <div className="p-1.5 bg-slate-50 rounded-lg shrink-0">
                       {iconAndColor?.icon}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-xs font-bold text-slate-800 leading-snug">
+                      <div className="text-[11px] sm:text-xs font-bold text-slate-800 leading-tight truncate">
                         {iconAndColor?.label}: {prettyVal}
                       </div>
-                      <div className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-1 min-w-0 leading-snug">
+                      <div className="text-[9px] sm:text-[9.5px] text-slate-400 flex items-center gap-1 mt-0.5 min-w-0 leading-tight">
                         <span className="font-mono text-slate-400 font-bold shrink-0">
                           {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                         {log.notes && (
                           <>
-                            <span className="text-slate-200 shrink-0">•</span>
+                            <span className="text-slate-300 shrink-0">•</span>
                             <span className="truncate italic text-slate-500 font-medium">{log.notes}</span>
                           </>
                         )}
@@ -578,12 +578,12 @@ export default function Dashboard({
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2 shrink-0 ml-2">
+                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
                     {log.photo && (
                       <img
                         src={log.photo}
                         alt="Captured log"
-                        className="w-8 h-8 rounded-lg border border-slate-100 object-cover"
+                        className="w-6 h-6 rounded-md border border-slate-100 object-cover"
                         referrerPolicy="no-referrer"
                       />
                     )}
