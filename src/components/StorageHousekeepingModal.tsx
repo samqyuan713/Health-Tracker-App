@@ -3,6 +3,7 @@ import { HardDrive, Trash2, Image, MessageSquare, Database, RefreshCw, Check, Al
 import { MetricLog, ChatMessage, DailyGoals } from '../types';
 import { exportHealthBackupJSON, DEFAULT_GOALS, DEFAULT_HOSTED_BACKEND_URL, getApiBaseUrl, getFullApiUrl } from '../utils';
 import { SupportedLanguage, TRANSLATIONS, getTranslation } from '../utils/i18n';
+import healthcareIcon from '../assets/images/healthcare_app_icon_1788006552714.jpg';
 
 interface StorageHousekeepingModalProps {
   isOpen: boolean;
@@ -435,10 +436,13 @@ export default function StorageHousekeepingModal({
           <div className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between gap-3 shadow-xs">
             <div className="flex items-center gap-3">
               <img 
-                src="/assets/icon.png" 
+                src={healthcareIcon} 
                 alt="Healthcare App Icon" 
                 className="w-12 h-12 rounded-xl border border-slate-200 shadow-xs object-cover shrink-0"
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/assets/icon.png';
+                }}
               />
               <div>
                 <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
@@ -451,9 +455,9 @@ export default function StorageHousekeepingModal({
               </div>
             </div>
             <a
-              href="/assets/icon.png"
+              href={healthcareIcon}
               download="vitalstream_healthcare_icon.png"
-              className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-extrabold flex items-center gap-1 transition-all active:scale-95 shrink-0 shadow-xs"
+              className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-extrabold flex items-center gap-1 transition-all active:scale-95 shrink-0 shadow-xs cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download</span>
