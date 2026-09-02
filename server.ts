@@ -586,6 +586,9 @@ Acoustic Theme: ${style || "Piano and Strings"}
     }
   });
 
+  // Serve static assets directory (app icon, artifacts)
+  app.use("/assets", express.static(path.join(process.cwd(), "assets")));
+
   // Vite integration middleware
   if (process.env.NODE_ENV !== "production") {
     console.log("Mounting Vite dev server middleware...");
